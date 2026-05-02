@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, CheckCircle, XCircle, Search, Filter, BookOpen } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, XCircle, Search, BookOpen } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, UserPlus, MoreHorizontal, Mail, Phone, MapPin, GraduationCap, Shield } from 'lucide-react';
+import { Search, UserPlus, Phone, MapPin, GraduationCap, Shield } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';

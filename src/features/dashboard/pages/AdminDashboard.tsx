@@ -162,21 +162,19 @@ const AdminDashboard = () => {
               {/* Quick Actions / Active Courses */}
               <div className="card h-max">
                 <div className="p-6 border-b border-light">
-                  <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', margin: 0 }}>Course Distribution</h3>
+                  <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', margin: 0 }}>Active Batches</h3>
                 </div>
                 <div className="p-6">
                   <div className="flex flex-col gap-4">
-                    {courses.slice(0, 4).map(course => (
-                      <div key={course.id}>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{course.title}</span>
-                          <span style={{ color: 'var(--text-muted)' }}>{course.enrolledCount}</span>
-                        </div>
-                        <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--bg-main)', borderRadius: '4px', overflow: 'hidden' }}>
-                          <div style={{ width: `${Math.min(100, (course.enrolledCount / 400) * 100)}%`, height: '100%', backgroundColor: course.color, borderRadius: '4px' }}></div>
-                        </div>
+                    <div className="p-4 bg-gray-50 rounded-2xl">
+                      <div className="flex justify-between text-xs font-black uppercase tracking-widest text-gray-400 mb-1">
+                        <span>Batch A</span>
+                        <span>45 Students</span>
                       </div>
-                    ))}
+                      <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-primary w-[75%] rounded-full"></div>
+                      </div>
+                    </div>
                   </div>
                   
                   <button className="btn btn-outline w-full mt-6" onClick={() => setActiveTab('courses')}>
