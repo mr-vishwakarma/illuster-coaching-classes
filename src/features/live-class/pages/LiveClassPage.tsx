@@ -7,42 +7,135 @@ import {
   X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../../../shared/lib/supabase';
+import { useAuth } from '../../../shared/context/AuthContext';
+import { toast } from 'react-toastify';
+import { useEffect, useRef } from 'react';
 
 const LiveClass = () => {
+  const { user } = useAuth();
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [activeTab, setActiveTab] = useState<'chat' | 'participants'>('chat');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [chatMessage, setChatMessage] = useState('');
+  const [isHandRaised, setIsHandRaised] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Mock chat messages
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'Teacher', text: 'Welcome everyone! We will start in 2 minutes.', time: '10:00 AM', isTeacher: true },
-    { id: 2, sender: 'Rahul Kumar', text: 'Good morning sir!', time: '10:01 AM', isTeacher: false },
-    { id: 3, sender: 'Priya Singh', text: 'Morning everyone.', time: '10:01 AM', isTeacher: false },
-  ]);
+  // Real-time states
+  const [messages, setMessages] = useState<any[]>([]);
+  const [participants, setParticipants] = useState<any[]>([]);
+  const sessionId = "batch-a-sys-design"; // This would be dynamic in production
 
-  // Mock participants
-  const participants = [
-    { id: 1, name: 'Alex Teacher', role: 'Host', isMuted: false, isVideoOff: false },
-    { id: 2, name: 'You (Rahul Kumar)', role: 'Student', isMuted: isMuted, isVideoOff: isVideoOff },
-    { id: 3, name: 'Priya Singh', role: 'Student', isMuted: true, isVideoOff: false },
-    { id: 4, name: 'Amit Patel', role: 'Student', isMuted: true, isVideoOff: true },
-    { id: 5, name: 'Neha Sharma', role: 'Student', isMuted: false, isVideoOff: true },
-  ];
+    // 1. Log Attendance & Fetch Participants
+    logAttendance();
+    fetchParticipants();
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatMessage.trim()) return;
+    // 2. Fetch Initial Messages
+    fetchMessages();
+
+    // 3. Subscribe to Realtime Chat & Attendance
+    const chatChannel = supabase
+      .channel('live-chat')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'live_messages', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          setMessages(prev => [...prev, payload.new]);
+          scrollToBottom();
+        }
+      )
+      .subscribe();
+
+    const attendanceChannel = supabase
+      .channel('live-attendance')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'live_attendance', filter: `session_id=eq.${sessionId}` },
+        () => {
+          fetchParticipants();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(chatChannel);
+      supabase.removeChannel(attendanceChannel);
+    };
+  }, [user]);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const fetchMessages = async () => {
+    const { data } = await supabase
+      .from('live_messages')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true });
     
-    setMessages([...messages, {
-      id: Date.now(),
-      sender: 'You (Rahul Kumar)',
-      text: chatMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isTeacher: false
-    }]);
-    setChatMessage('');
+    if (data) setMessages(data);
+    setTimeout(scrollToBottom, 100);
+  };
+
+  const fetchParticipants = async () => {
+    const { data } = await supabase
+      .from('live_attendance')
+      .select(`
+        *,
+        profiles:user_id (full_name, role, avatar_url)
+      `)
+      .eq('session_id', sessionId);
+    
+    if (data) {
+      setParticipants(data.map(p => ({
+        id: p.user_id,
+        name: (p as any).profiles?.full_name || 'Student',
+        role: (p as any).profiles?.role === 'student' ? 'Student' : 'Host',
+        isMuted: true,
+        isVideoOff: false
+      })));
+    }
+  };
+
+  const logAttendance = async () => {
+    if (!user) return;
+    await supabase.from('live_attendance').insert({
+      session_id: sessionId,
+      user_id: user.id
+    });
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatMessage.trim() || !user) return;
+    
+    const newMessage = {
+      session_id: sessionId,
+      user_id: user.id,
+      user_name: user.name,
+      message: chatMessage,
+      is_teacher: user.role === 'admin' || user.role === 'tutor'
+    };
+
+    const { error } = await supabase.from('live_messages').insert(newMessage);
+    
+    if (error) {
+      toast.error("Failed to send message");
+    } else {
+      setChatMessage('');
+    }
+  };
+
+  const toggleHandRaise = () => {
+    setIsHandRaised(!isHandRaised);
+    if (!isHandRaised) {
+      toast.info("Your hand is raised! The teacher will address you shortly.", {
+        icon: "✋",
+        position: "bottom-center"
+      });
+    }
   };
 
   return (
@@ -165,17 +258,18 @@ const LiveClass = () => {
                   <>
                     <div className="flex-1 overflow-y-auto flex flex-col gap-4">
                       {messages.map(msg => (
-                        <div key={msg.id} className={`flex flex-col ${msg.sender.includes('You') ? 'items-end' : 'items-start'}`}>
-                          <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-xs font-medium text-white/70">{msg.sender}</span>
-                            {msg.isTeacher && <span className="bg-green-500/20 text-green-400 text-[9px] px-1.5 py-0.5 rounded font-bold">HOST</span>}
-                            <span className="text-[10px] text-white/30">{msg.time}</span>
+                        <div key={msg.id} className={`flex flex-col ${msg.user_id === user?.id ? 'items-end' : 'items-start'}`}>
+                          <div className={`flex items-baseline gap-2 mb-1 ${msg.user_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <span className="text-[10px] font-bold text-white/70">{msg.user_name}</span>
+                            {msg.is_teacher && <span className="bg-green-500/20 text-green-400 text-[8px] px-1.5 py-0.5 rounded font-black tracking-widest uppercase">HOST</span>}
+                            <span className="text-[9px] text-white/30">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
-                          <div className={`px-4 py-2 rounded-2xl text-sm ${msg.sender.includes('You') ? 'bg-green-600 rounded-tr-sm' : 'bg-white/10 rounded-tl-sm'}`}>
-                            {msg.text}
+                          <div className={`px-4 py-2 rounded-2xl text-sm leading-relaxed ${msg.user_id === user?.id ? 'bg-green-600 rounded-tr-sm text-white' : 'bg-white/10 rounded-tl-sm text-white/90'}`}>
+                            {msg.message}
                           </div>
                         </div>
                       ))}
+                      <div ref={chatEndRef} />
                     </div>
                     
                     {/* Chat Input */}
@@ -252,8 +346,11 @@ const LiveClass = () => {
             <MonitorUp size={18} />
           </button>
           
-          <button className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all">
-            <Hand size={18} />
+          <button 
+            onClick={toggleHandRaise}
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all ${isHandRaised ? 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.4)] scale-110' : 'bg-white/5 hover:bg-white/10 text-white'}`}
+          >
+            <Hand size={18} fill={isHandRaised ? "currentColor" : "none"} />
           </button>
 
           <Link to="/dashboard" className="px-4 md:px-6 h-10 md:h-12 rounded-xl bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 font-black text-[10px] md:text-sm uppercase tracking-widest ml-2 transition-all">
