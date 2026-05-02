@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, BookOpen, Award, Star, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, Award, Zap } from 'lucide-react';
 
 const bookData = [
   {
