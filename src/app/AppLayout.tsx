@@ -17,7 +17,7 @@ const AppLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#050505]">
-      {(!isLiveClass && !isDashboard) && <Navbar />}
+      {!isLiveClass && <Navbar />}
       <main className="flex-grow">
         <ErrorBoundary>
           <AppRoutes />

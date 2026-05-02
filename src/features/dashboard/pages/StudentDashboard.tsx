@@ -1,5 +1,5 @@
 import  { useState } from 'react';
-import { Book, PlayCircle, FileText, Calendar, Clock, Video } from 'lucide-react';
+import { Book, PlayCircle, FileText, Calendar, Clock, Video, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { courses, studyMaterials } from '../../courses';
@@ -26,8 +26,15 @@ const StudentDashboard = () => {
     <div className="pt-[140px] md:pt-[180px] bg-[var(--bg-main)] min-h-screen">
       
       {/* Dashboard Header */}
-      <div className="bg-[#050505] text-white py-8 md:py-14 border-b border-white/5">
+      <div className="bg-[#050505] text-white pt-10 pb-8 md:pb-14 border-b border-white/5">
         <div className="container mx-auto px-4 md:px-6">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-white/40 hover:text-orange-500 transition-colors mb-8 group"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-widest">Back to Home</span>
+          </Link>
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white text-black flex items-center justify-center font-display text-2xl md:text-3xl font-bold shadow-xl">
               {user?.avatar}
