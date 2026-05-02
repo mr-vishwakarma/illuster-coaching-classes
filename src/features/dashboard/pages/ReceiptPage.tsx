@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../../shared/lib/supabase';
-import { Printer, ArrowLeft, Download, CheckCircle2, IndianRupee } from 'lucide-react';
+import { Printer, ArrowLeft, CheckCircle2, IndianRupee } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ReceiptData {
