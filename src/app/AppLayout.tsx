@@ -3,7 +3,6 @@ import Navbar from '../shared/components/Navbar';
 import Footer from '../shared/components/Footer';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
 import AppRoutes from './routes';
-import { useAuth } from '../shared/context/AuthContext';
 
 // ─── Layout wrapper with conditional Navbar/Footer ───────────────────────────
 const AppLayout = () => {
