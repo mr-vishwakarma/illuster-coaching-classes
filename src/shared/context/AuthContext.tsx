@@ -8,7 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   role: UserRole | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>;
+  login: (email: string, password: string, requiredRole?: UserRole) => Promise<{ success: boolean; error?: string; user?: User }>;
   logout: () => Promise<void>;
 }
 
@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Sync session from Supabase
   useEffect(() => {
-    // 1. Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         fetchProfile(session.user.id, session.user.email!);
@@ -29,7 +28,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
 
-    // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         fetchProfile(session.user.id, session.user.email!);
@@ -76,8 +74,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   };
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, requiredRole?: UserRole) => {
     setIsLoading(true);
+    
+    // 1. Authenticate with Supabase
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
@@ -86,12 +86,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     
     if (data.user) {
+      // 2. Immediately check profile for role verification
       const profile = await getProfile(data.user.id, data.user.email!);
-      if (profile) {
-        setUser(profile);
+      
+      if (!profile) {
+        await supabase.auth.signOut();
         setIsLoading(false);
-        return { success: true, user: profile };
+        return { success: false, error: "Account profile not found. Please contact support." };
       }
+
+      // 3. STRICT ROLE CHECK
+      if (requiredRole && profile.role !== requiredRole) {
+        await supabase.auth.signOut();
+        setIsLoading(false);
+        return { 
+          success: false, 
+          error: `Access Denied: You are registered as a ${profile.role}, but you are trying to log in to the ${requiredRole} portal.` 
+        };
+      }
+
+      setUser(profile);
+      setIsLoading(false);
+      return { success: true, user: profile };
     }
     
     return { success: true };

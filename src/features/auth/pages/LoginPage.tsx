@@ -35,7 +35,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const res = await login(email, password);
+    const res = await login(email, password, role);
     if (res.success) {
       toast.success(`Welcome back, ${res.user?.name}!`);
       navigate(from, { replace: true });
