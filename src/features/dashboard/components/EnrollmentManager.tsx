@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Check, X, Clock, User, BookOpen, AlertCircle } from 'lucide-react';
+import { Check, X, Clock, BookOpen, AlertCircle } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface EnrollmentRequest {
   id: string;

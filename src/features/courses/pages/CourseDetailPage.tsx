@@ -24,7 +24,7 @@ const CourseDetail = () => {
   }, [user, id]);
 
   const checkEnrollmentStatus = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('course_enrollments')
       .select('status')
       .eq('student_id', user?.id)

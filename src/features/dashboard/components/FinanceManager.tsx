@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IndianRupee, Plus, Search, FileText, TrendingUp } from 'lucide-react';
+import { IndianRupee, Plus, Search, TrendingUp } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
