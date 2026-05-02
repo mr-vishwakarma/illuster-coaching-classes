@@ -5,6 +5,8 @@ import { adminStats } from '../';
 import { courses } from '../../courses';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
+import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
+import { HelpCircle, MessageSquare } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -35,6 +37,7 @@ const AdminDashboard = () => {
             { id: 'live', icon: <Video size={20} />, label: 'Live Classes' },
             { id: 'students', icon: <Users size={20} />, label: 'Student Management' },
             { id: 'courses', icon: <BookOpen size={20} />, label: 'Course Catalog' },
+            { id: 'questies', icon: <HelpCircle size={20} />, label: 'Doubt Portal' },
             { id: 'finance', icon: <IndianRupee size={20} />, label: 'Finance & Fees' }
           ].map(item => (
             <button
@@ -215,6 +218,19 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Questies / Doubt Portal Tab */}
+        {activeTab === 'questies' && (
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-end mb-2">
+              <div>
+                <h2 className="text-2xl font-display font-black text-gray-800">Doubt Portal</h2>
+                <p className="text-sm text-gray-500">Review and resolve student academic questions.</p>
+              </div>
+            </div>
+            <QuestieAdminList />
           </div>
         )}
 

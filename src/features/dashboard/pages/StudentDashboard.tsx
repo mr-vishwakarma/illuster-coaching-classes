@@ -4,10 +4,14 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { courses, studyMaterials } from '../../courses';
 import { upcomingClasses } from '../../live-class';
+import { QuestieForm } from '../../questies/components/QuestieForm';
+import { QuestieList } from '../../questies/components/QuestieList';
+import { MessageSquare, HelpCircle } from 'lucide-react';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const enrolledCourseData = courses.filter(c => user?.enrolledCourses.includes(c.id));
   
@@ -44,7 +48,7 @@ const StudentDashboard = () => {
       <div className="bg-black/80 backdrop-blur-md border-b border-white/10 sticky top-[110px] md:top-[150px] z-30">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex overflow-x-auto scrollbar-hide">
-            {['overview', 'my-courses', 'study-materials', 'schedule'].map((tab) => (
+            {['overview', 'my-courses', 'study-materials', 'questies', 'schedule'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -175,8 +179,37 @@ const StudentDashboard = () => {
                 
                 <button onClick={() => setActiveTab('schedule')} className="w-full mt-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">Full Schedule</button>
               </div>
+
+              {/* Questies Quick Link */}
+              <div className="card mt-6 p-6 bg-gradient-to-br from-[#8a76ff]/10 to-transparent border-[#8a76ff]/20">
+                <h3 className="flex items-center gap-2 text-lg font-display font-black mb-4">
+                  <HelpCircle size={18} className="text-[#8a76ff]" /> Doubt Support
+                </h3>
+                <p className="text-xs text-white/40 mb-5 leading-relaxed">
+                  Stuck on a problem? Ask our expert tutors and get a step-by-step solution.
+                </p>
+                <button 
+                  onClick={() => setActiveTab('questies')}
+                  className="w-full py-3 rounded-xl bg-[#8a76ff] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#7b65ff] transition-all shadow-lg shadow-[#8a76ff]/20"
+                >
+                  Ask a Question
+                </button>
+              </div>
             </div>
 
+          </div>
+        )}
+
+        {activeTab === 'questies' && (
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="lg:w-1/2">
+              <h2 className="text-xl md:text-2xl font-display font-black mb-6">Ask a New Doubt</h2>
+              <QuestieForm onSubmitted={() => setRefreshTrigger(prev => prev + 1)} />
+            </div>
+            <div className="lg:w-1/2">
+              <h2 className="text-xl md:text-2xl font-display font-black mb-6">Doubt History</h2>
+              <QuestieList refreshTrigger={refreshTrigger} />
+            </div>
           </div>
         )}
 
