@@ -26,9 +26,7 @@ const AdminDashboard = () => {
             </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{user?.name}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {user?.role === 'admin' ? 'Administrator' : 'Expert Tutor'}
-              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Administrator</div>
             </div>
           </div>
         </div>
@@ -66,7 +64,7 @@ const AdminDashboard = () => {
         
         <div className="flex justify-between items-center mb-8">
           <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', margin: 0, color: 'var(--text-main)' }}>
-            {user?.role === 'admin' ? 'Admin' : 'Tutor'} Dashboard
+            Admin Dashboard
           </h1>
           <div className="flex gap-3">
             <button className="btn btn-secondary flex items-center gap-2">
