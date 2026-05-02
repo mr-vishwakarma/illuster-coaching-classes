@@ -8,7 +8,6 @@ import { useAuth } from '../shared/context/AuthContext';
 // ─── Layout wrapper with conditional Navbar/Footer ───────────────────────────
 const AppLayout = () => {
   const { pathname } = useLocation();
-  const { isAuthenticated } = useAuth();
   
   const isLiveClass = pathname === '/live-class';
   const isLogin = pathname === '/login';
