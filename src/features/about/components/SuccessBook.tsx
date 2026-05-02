@@ -1,17 +1,16 @@
-import { useRef, useState, forwardRef } from 'react';
+import { useRef, useState, forwardRef, useEffect } from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import useSound from 'use-sound';
 import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
 
 /* ─────────────────────── palette ─────────────────────────── */
-const PAGE_BG    = '#8a76ff';   // simplified to 6-digit for reliability
+const PAGE_BG    = '#8a76ffff';   
 const ACCENT     = '#3500e4ff';   
 const DARK_TXT   = '#2D2B3D';
 const BORDER_CLR = '#ff802bff';   
-/* ─────────────────────── Spiral Binding ─────────────────────
-   Absolutely-positioned SVG rendered OVER the book spread.
-   Each ring is a rounded rectangle (like the metal coil photo).   */
-const SpiralBinding = () => {
+
+/* ─────────────────────── Spiral Binding ───────────────────── */
+const SpiralBinding = ({ isMobile }: { isMobile: boolean }) => {
   const ringCount = 18;
   const ringH     = 18;
   const gap       = 6;
@@ -19,13 +18,15 @@ const SpiralBinding = () => {
 
   return (
     <div
-      className="absolute inset-y-0 left-1/2 -translate-x-1/2 flex items-center justify-center z-30 pointer-events-none"
-      style={{ width: 28 }}
+      className={`absolute inset-y-0 z-30 pointer-events-none flex items-center justify-center transition-all duration-500 ${
+        isMobile ? 'left-0' : 'left-1/2 -translate-x-1/2'
+      }`}
+      style={{ width: isMobile ? 20 : 28 }}
     >
       <svg
-        width={28}
+        width={isMobile ? 20 : 28}
         height={totalH}
-        viewBox={`0 0 28 ${totalH}`}
+        viewBox={`0 0 ${isMobile ? 20 : 28} ${totalH}`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -33,15 +34,12 @@ const SpiralBinding = () => {
           const y = i * (ringH + gap);
           return (
             <g key={i}>
-              {/* back half of ring (shadow) */}
-              <rect x={2} y={y + 2} width={24} height={ringH - 4} rx={5}
+              <rect x={2} y={y + 2} width={isMobile ? 16 : 24} height={ringH - 4} rx={5}
                     fill="#b0a8c8" opacity={0.5} />
-              {/* ring body */}
-              <rect x={0} y={y} width={28} height={ringH} rx={6}
+              <rect x={0} y={y} width={isMobile ? 20 : 28} height={ringH} rx={6}
                     fill="url(#ringGrad)" stroke="#c8c0e0" strokeWidth={0.8} />
-              {/* inner window to create coil effect matches page color */}
-              <rect x={6} y={y + 4} width={16} height={ringH - 8} rx={3}
-                    fill={PAGE_BG} opacity={0.8} />
+              <rect x={isMobile ? 4 : 6} y={y + 4} width={isMobile ? 12 : 16} height={ringH - 8} rx={3}
+                    fill="#e2dff3" opacity={0.7} />
             </g>
           );
         })}
@@ -70,7 +68,6 @@ const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; bg?: string
       }}
       className="w-full h-full overflow-hidden select-none relative"
     >
-      {/* Visual edge thickness for 'hardsolid' feel */}
       <div className="absolute inset-y-0 right-0 w-[3px] bg-black/5 z-20"></div>
       {children}
     </div>
@@ -80,20 +77,20 @@ Page.displayName = 'Page';
 
 const CoverPage = forwardRef<HTMLDivElement>((_, ref) => (
   <Page ref={ref} bg={PAGE_BG}>
-    <div className="w-full h-full flex flex-col items-center justify-center p-8 relative">
+    <div className="w-full h-full flex flex-col items-center justify-center p-6 md:p-8 relative">
       <div style={{ color: 'white' }} className="mb-4 opacity-80">
         <BookOpen size={44} strokeWidth={1.2} />
       </div>
-      <p style={{ color: 'white', letterSpacing: '0.4em', fontSize: 9 }}
-         className="font-bold uppercase mb-3 opacity-90">
+      <p style={{ color: 'white', letterSpacing: '0.4em', fontSize: 8 }}
+         className="font-bold uppercase mb-3 opacity-90 text-center">
         ILLUSTER COACHING CLASSES
       </p>
       <h1 style={{ color: 'white', lineHeight: 1.05 }}
-          className="text-4xl font-black text-center mb-4 tracking-tighter">
+          className="text-3xl md:text-4xl font-black text-center mb-4 tracking-tighter">
         THE&nbsp;SUCCESS<br/>DIARY
       </h1>
       <div style={{ background: BORDER_CLR }} className="h-0.5 w-14 mb-4 rounded-full" />
-      <p style={{ color: 'white' }} className="text-[11px] font-medium tracking-widest uppercase opacity-80">
+      <p style={{ color: 'white' }} className="text-[10px] md:text-[11px] font-medium tracking-widest uppercase opacity-80">
         Annual Edition 2024
       </p>
       <div style={{ background: 'white', opacity: 0.2 }}
@@ -105,7 +102,6 @@ const CoverPage = forwardRef<HTMLDivElement>((_, ref) => (
 ));
 CoverPage.displayName = 'CoverPage';
 
-/* ─────────────────────── Index ──────────────────────────────  */
 interface ChapterEntry { num: number; title: string; subtitle: string; page: number }
 const chapters: ChapterEntry[] = [
   { num: 1, title: 'Our Milestones',  subtitle: 'A decade of excellence',   page: 2 },
@@ -116,14 +112,14 @@ const chapters: ChapterEntry[] = [
 const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
   ({ onJump }, ref) => (
     <Page ref={ref} bg={PAGE_BG}>
-      <div className="p-8 h-full flex flex-col">
+      <div className="p-6 md:p-8 h-full flex flex-col">
         <div className="flex items-center gap-2 mb-6">
           <List size={18} style={{ color: 'white' }} />
-          <h2 style={{ color: 'white' }} className="text-xl font-black tracking-tight">
+          <h2 style={{ color: 'white' }} className="text-lg md:text-xl font-black tracking-tight">
             Table of Contents
           </h2>
         </div>
-        <div className="flex flex-col gap-3 flex-1">
+        <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
           {chapters.map(ch => (
             <button
               key={ch.num}
@@ -133,22 +129,22 @@ const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p style={{ color: 'white', fontSize: 9 }}
+                  <p style={{ color: 'white', fontSize: 8 }}
                      className="font-black uppercase tracking-widest mb-0.5 opacity-80">
                     Chapter {ch.num}
                   </p>
-                  <h3 style={{ color: 'white' }} className="text-base font-black">{ch.title}</h3>
-                  <p style={{ color: 'white' }} className="text-[10px] font-medium opacity-60">{ch.subtitle}</p>
+                  <h3 style={{ color: 'white' }} className="text-sm md:text-base font-black">{ch.title}</h3>
+                  <p style={{ color: 'white' }} className="text-[9px] md:text-[10px] font-medium opacity-60">{ch.subtitle}</p>
                 </div>
                 <span style={{ color: 'white' }}
-                      className="text-2xl font-black opacity-20 group-hover:opacity-40 transition-opacity">
+                      className="text-xl md:text-2xl font-black opacity-20 group-hover:opacity-40 transition-opacity">
                   {String(ch.page).padStart(2, '0')}
                 </span>
               </div>
             </button>
           ))}
         </div>
-        <p style={{ color: 'white', fontSize: 9 }} className="text-center tracking-widest uppercase mt-4 opacity-40">
+        <p style={{ color: 'white', fontSize: 8 }} className="text-center tracking-widest uppercase mt-4 opacity-40">
           Flip pages to explore →
         </p>
       </div>
@@ -157,7 +153,6 @@ const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
 );
 IndexPage.displayName = 'IndexPage';
 
-/* ─────────────────────── Content data ───────────────────────  */
 interface PageData {
   side: 'left' | 'right';
   chapter: string;
@@ -220,11 +215,10 @@ const pages: PageData[] = [
     imageLabel:'Assessment Suite', accent:ACCENT, tag:'Practice' },
 ];
 
-/* ─────────────────────── Content Page ───────────────────────  */
 const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number }>(
   ({ data, pageNum }, ref) => (
     <Page ref={ref} bg={PAGE_BG}>
-      <div className="w-full h-full flex flex-col p-7 gap-3">
+      <div className="w-full h-full flex flex-col p-6 md:p-7 gap-3">
         <div className="flex items-center justify-between">
           <p style={{ color: 'white', fontSize: 8 }} className="font-black uppercase tracking-[0.35em] opacity-80">
             {data.chapter}
@@ -247,10 +241,10 @@ const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number
         </div>
 
         <div style={{ background: 'white' }} className="h-px w-8 rounded-full opacity-30" />
-        <h2 style={{ color: 'white', lineHeight: 1.1 }} className="text-xl font-black tracking-tight">
+        <h2 style={{ color: 'white', lineHeight: 1.1 }} className="text-lg md:text-xl font-black tracking-tight">
           {data.title}
         </h2>
-        <p style={{ color: 'white' }} className="text-[11px] leading-relaxed flex-1 opacity-80">
+        <p style={{ color: 'white' }} className="text-[10px] md:text-[11px] leading-relaxed flex-1 opacity-80">
           {data.body}
         </p>
         <p style={{ color: 'white', fontSize: 8 }}
@@ -263,14 +257,13 @@ const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number
 );
 ContentPage.displayName = 'ContentPage';
 
-/* ─────────────────────── Back Cover ─────────────────────────  */
 const BackCover = forwardRef<HTMLDivElement>((_, ref) => (
   <Page ref={ref} bg="#2D2B3D">
     <div className="w-full h-full flex flex-col items-center justify-center p-8">
       <div style={{ color: PAGE_BG, opacity: 0.2 }} className="mb-5">
         <BookOpen size={56} strokeWidth={1} />
       </div>
-      <h2 style={{ color: PAGE_BG }} className="text-2xl font-black text-center mb-3 tracking-tighter">
+      <h2 style={{ color: PAGE_BG }} className="text-xl md:text-2xl font-black text-center mb-3 tracking-tighter">
         Your Journey<br />Starts Here.
       </h2>
       <div style={{ background: BORDER_CLR }} className="h-0.5 w-10 mb-4 rounded-full opacity-60" />
@@ -282,17 +275,20 @@ const BackCover = forwardRef<HTMLDivElement>((_, ref) => (
 ));
 BackCover.displayName = 'BackCover';
 
-/* ─────────────────────── MAIN ───────────────────────────────  */
 const SuccessBook = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bookRef = useRef<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const totalPages = 2 + pages.length + 1; // cover + index + content + back
+  const [isMobile, setIsMobile] = useState(false);
+  const totalPages = 2 + pages.length + 1; 
 
-  /**
-   * 🔊 Sound path fixed
-   */
-  const [playFlip] = useSound('/sounds/oxidvideos-page-flip2-178323.mp3', { volume: 0.65 });
+  const [playFlip] = useSound('/sounds/dragon-studio-flipping-book-page-499646.mp3', { volume: 0.85 });
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const flip = (dir: 'next' | 'prev') => {
     playFlip();
@@ -308,68 +304,60 @@ const SuccessBook = () => {
   const onFlip = (e: { data: number }) => setCurrentPage(e.data);
 
   return (
-    /* outer section – background: #e5e5e5 */
-    <div className="py-20 overflow-hidden" style={{ background: '#e5e5e5ff' }}>
-
-      {/* header */}
-      <div className="container mx-auto px-6 text-center mb-14">
-        <p style={{ color: ACCENT, letterSpacing: '0.4em', fontSize: 11 }}
+    <div className="py-12 md:py-20 overflow-hidden" style={{ background: '#e5e5e5ff' }}>
+      <div className="container mx-auto px-4 text-center mb-8 md:mb-14">
+        <p style={{ color: ACCENT, letterSpacing: '0.4em', fontSize: 10 }}
            className="font-black uppercase mb-3">Our Story in Pages</p>
-        <h2 style={{ color: DARK_TXT }} className="text-4xl md:text-6xl font-black mb-3 tracking-tighter">
+        <h2 style={{ color: DARK_TXT }} className="text-3xl md:text-6xl font-black mb-3 tracking-tighter">
           The <span style={{ color: ACCENT }}>Illuster</span> Diary
         </h2>
-        <p style={{ color: '#7a7890' }} className="max-w-md mx-auto text-sm font-medium">
+        <p style={{ color: '#7a7890' }} className="max-w-md mx-auto text-xs md:text-sm font-medium">
           Flip through our chapters of milestones, toppers, and everything we offer.
         </p>
       </div>
 
-      {/* book row */}
-      <div className="flex items-center justify-center gap-4 md:gap-8 px-4">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 px-4">
+        <div className="flex items-center justify-center gap-4 order-2 md:order-1">
+          <button
+            onClick={() => flip('prev')}
+            disabled={currentPage === 0}
+            style={{ background: '#c8c0e820', border: '1px solid #c8c0e840', color: DARK_TXT }}
+            className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center disabled:opacity-20 hover:bg-black/5 transition-all shrink-0"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        </div>
 
-        {/* prev button */}
-        <button
-          onClick={() => flip('prev')}
-          disabled={currentPage === 0}
-          style={{ background: '#c8c0e820', border: '1px solid #c8c0e840', color: DARK_TXT }}
-          className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-20 hover:bg-black/5 transition-all shrink-0"
-        >
-          <ChevronLeft size={22} />
-        </button>
-
-        {/* ── salmon-border frame ── */}
         <div
           style={{
-            border: `12px solid ${BORDER_CLR}`,
-            borderRadius: '22px',
-            padding: '12px',
-            background: BORDER_CLR,
+            border: `${isMobile ? '6px' : '12px'} solid ${BORDER_CLR}`,
+            borderRadius: isMobile ? '16px' : '22px',
+            padding: isMobile ? '6px' : '12px',
+            background: '#d4956a',
             boxShadow: '0 40px 100px -20px rgba(0,0,0,0.35), 0 15px 40px rgba(0,0,0,0.15)',
             position: 'relative',
           }}
+          className="order-1 md:order-2"
         >
-          {/* inner container */}
-          <div style={{ borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
-
-            {/* spiral binding overlay */}
-            <SpiralBinding />
-
+          <div style={{ borderRadius: isMobile ? '8px' : '12px', overflow: 'hidden', position: 'relative' }}>
+            <SpiralBinding isMobile={isMobile} />
             {/* @ts-expect-error react-pageflip types */}
             <HTMLFlipBook
               ref={bookRef}
-              width={420}
-              height={580}
+              width={isMobile ? 280 : 420}
+              height={isMobile ? 400 : 580}
               size="fixed"
-              minWidth={300}
+              minWidth={200}
               maxWidth={500}
-              minHeight={400}
+              minHeight={300}
               maxHeight={750}
-              showCover
+              showCover={!isMobile}
               mobileScrollSupport
               onFlip={onFlip}
               drawShadow
               flippingTime={800}
               startPage={0}
-              usePortrait={false}
+              usePortrait={isMobile}
               startZIndex={10}
               autoSize={false}
               clickEventForward
@@ -389,19 +377,19 @@ const SuccessBook = () => {
           </div>
         </div>
 
-        {/* next button */}
-        <button
-          onClick={() => flip('next')}
-          disabled={currentPage >= totalPages - 1}
-          style={{ background: '#c8c0e820', border: '1px solid #c8c0e840', color: DARK_TXT }}
-          className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-20 hover:bg-black/5 transition-all shrink-0"
-        >
-          <ChevronRight size={22} />
-        </button>
+        <div className="flex items-center justify-center gap-4 order-3">
+          <button
+            onClick={() => flip('next')}
+            disabled={currentPage >= totalPages - 1}
+            style={{ background: '#c8c0e820', border: '1px solid #c8c0e840', color: DARK_TXT }}
+            className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center disabled:opacity-20 hover:bg-black/5 transition-all shrink-0"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
       </div>
 
-      {/* chapter jump pills */}
-      <div className="flex items-center justify-center gap-3 mt-10 flex-wrap px-4">
+      <div className="flex items-center justify-center gap-2 md:gap-3 mt-8 md:mt-10 flex-wrap px-4 max-w-2xl mx-auto">
         {chapters.map(ch => (
           <button
             key={ch.num}
@@ -411,24 +399,16 @@ const SuccessBook = () => {
               border: `1px solid ${ACCENT}40`,
               color: DARK_TXT,
             }}
-            className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/5 transition-all"
+            className="px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-black/5 transition-all"
           >
-            Ch.{ch.num} — {ch.title}
+            Ch.{ch.num}
           </button>
         ))}
       </div>
 
-      {/* page counter */}
-      <p style={{ color: '#7a7890' }} className="text-center mt-4 text-[11px] font-medium">
+      <p style={{ color: '#7a7890' }} className="text-center mt-4 text-[10px] md:text-[11px] font-medium">
         Page {currentPage + 1} / {totalPages}
       </p>
-
-      {/* 📢 sound file note (visible only in dev, hidden in prod) */}
-      {import.meta.env.DEV && (
-        <p className="text-center mt-3 text-[10px] text-gray-400">
-          🔊 Drop your audio file at: <code className="bg-gray-200 px-1 rounded">public/sounds/page-flip.mp3</code>
-        </p>
-      )}
     </div>
   );
 };
