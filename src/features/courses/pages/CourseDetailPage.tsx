@@ -28,9 +28,8 @@ const CourseDetail = () => {
     const mockMatch = mockCourses.find(c => c.id === id);
     if (mockMatch) setCourse(mockMatch);
 
-    // 2. Try to fetch from Supabase if id looks like a UUID
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (id && uuidRegex.test(id)) {
+    // 2. Try to fetch from Supabase
+    if (id) {
       const { data } = await supabase
         .from('courses')
         .select('*')
@@ -41,7 +40,7 @@ const CourseDetail = () => {
     }
 
     // 3. Check enrollment status if logged in
-    if (user && id && uuidRegex.test(id)) {
+    if (user && id) {
       const { data } = await supabase
         .from('course_enrollments')
         .select('status')
@@ -62,11 +61,7 @@ const CourseDetail = () => {
       return;
     }
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!id || !uuidRegex.test(id)) {
-      toast.warning("Enrollment is only available for live courses.");
-      return;
-    }
+    if (!id) return;
 
     if (enrollStatus !== 'none') return;
 

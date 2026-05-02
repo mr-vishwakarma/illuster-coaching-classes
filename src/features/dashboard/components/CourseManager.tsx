@@ -23,6 +23,7 @@ export const CourseManager = () => {
 
   // Form State
   const [formData, setFormData] = useState({
+    id: '',
     title: '',
     description: '',
     category: 'JEE',
@@ -54,6 +55,7 @@ export const CourseManager = () => {
     if (course) {
       setEditingCourse(course);
       setFormData({
+        id: course.id,
         title: course.title,
         description: course.description,
         category: course.category,
@@ -64,6 +66,7 @@ export const CourseManager = () => {
     } else {
       setEditingCourse(null);
       setFormData({
+        id: '',
         title: '',
         description: '',
         category: 'JEE',
@@ -92,9 +95,13 @@ export const CourseManager = () => {
         fetchCourses();
       }
     } else {
+      // Remove empty id to let Supabase generate UUID if not provided
+      const submitData = { ...formData };
+      if (!submitData.id) delete (submitData as any).id;
+
       const { error } = await supabase
         .from('courses')
-        .insert([formData]);
+        .insert([submitData]);
       
       if (error) toast.error("Creation failed");
       else {
@@ -236,6 +243,18 @@ export const CourseManager = () => {
 
               <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto max-h-[70vh]">
                 <div className="grid md:grid-cols-2 gap-6">
+                  {!editingCourse && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-black uppercase tracking-widest text-gray-400">Course ID / Slug (Optional)</label>
+                      <input 
+                        type="text" 
+                        className="w-full px-4 py-3 bg-gray-50 border border-light rounded-xl focus:outline-none focus:border-primary/50"
+                        value={formData.id}
+                        onChange={(e) => setFormData({...formData, id: e.target.value})}
+                        placeholder="e.g. course-jee-physics"
+                      />
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-widest text-gray-400">Course Title</label>
                     <input 
@@ -247,19 +266,20 @@ export const CourseManager = () => {
                       placeholder="e.g. JEE Advanced Physics"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-gray-400">Category</label>
-                    <select 
-                      className="w-full px-4 py-3 bg-gray-50 border border-light rounded-xl focus:outline-none focus:border-primary/50"
-                      value={formData.category}
-                      onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    >
-                      <option value="JEE">JEE</option>
-                      <option value="NEET">NEET</option>
-                      <option value="Foundation">Foundation</option>
-                      <option value="Advanced">Advanced</option>
-                    </select>
-                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-gray-400">Category</label>
+                  <select 
+                    className="w-full px-4 py-3 bg-gray-50 border border-light rounded-xl focus:outline-none focus:border-primary/50"
+                    value={formData.category}
+                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                  >
+                    <option value="JEE">JEE</option>
+                    <option value="NEET">NEET</option>
+                    <option value="Foundation">Foundation</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
                 </div>
 
                 <div className="space-y-2">
