@@ -2,10 +2,64 @@ import { useParams } from 'react-router-dom';
 import { Play, CheckCircle2, User, Cloud, Sparkles } from 'lucide-react';
 import { courses } from '../';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../../shared/context/AuthContext';
+import { supabase } from '../../../shared/lib/supabase';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const CourseDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const course = courses.find(c => c.id === id) || courses[0]; // Fallback to first course if not found for demo purposes
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const course = courses.find(c => c.id === id) || courses[0];
+
+  const [enrollStatus, setEnrollStatus] = useState<'none' | 'pending' | 'active'>('none');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (user && id) {
+      checkEnrollmentStatus();
+    }
+  }, [user, id]);
+
+  const checkEnrollmentStatus = async () => {
+    const { data, error } = await supabase
+      .from('course_enrollments')
+      .select('status')
+      .eq('student_id', user?.id)
+      .eq('course_id', id)
+      .maybeSingle();
+
+    if (data) {
+      setEnrollStatus(data.status as any);
+    }
+  };
+
+  const handleEnroll = async () => {
+    if (!user) {
+      toast.info("Please login to enroll");
+      navigate('/login');
+      return;
+    }
+
+    if (enrollStatus !== 'none') return;
+
+    setIsLoading(true);
+    const { error } = await supabase
+      .from('course_enrollments')
+      .insert([
+        { student_id: user.id, course_id: id, status: 'pending' }
+      ]);
+
+    if (error) {
+      toast.error("Failed to submit request");
+    } else {
+      toast.success("Enrollment request sent to Admin!");
+      setEnrollStatus('pending');
+    }
+    setIsLoading(false);
+  };
   
   return (
     <div className="pt-32 md:pt-40 min-h-screen bg-[#050805] text-white selection:bg-green-500/30">
@@ -156,9 +210,22 @@ const CourseDetail = () => {
 
               {/* CTA Buttons */}
               <div className="flex flex-col gap-3 md:gap-4">
-                <button className="w-full py-3.5 md:py-4 rounded-xl bg-[#34A853] hover:bg-[#2e964a] text-white font-black text-base md:text-lg shadow-[0_0_20px_rgba(52,168,83,0.3)] transition-all flex items-center justify-center gap-2 group uppercase tracking-widest">
-                  Enroll Now 
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <button 
+                  onClick={handleEnroll}
+                  disabled={isLoading || enrollStatus !== 'none'}
+                  className={`w-full py-3.5 md:py-4 rounded-xl font-black text-base md:text-lg shadow-lg transition-all flex items-center justify-center gap-2 group uppercase tracking-widest ${
+                    enrollStatus === 'active' 
+                      ? 'bg-green-600 cursor-default' 
+                      : enrollStatus === 'pending'
+                        ? 'bg-orange-500 cursor-default'
+                        : 'bg-[#34A853] hover:bg-[#2e964a]'
+                  }`}
+                >
+                  {isLoading ? 'Processing...' : 
+                   enrollStatus === 'active' ? 'Already Enrolled' : 
+                   enrollStatus === 'pending' ? 'Request Pending' : 
+                   'Enroll Now'}
+                  {enrollStatus === 'none' && <span className="group-hover:translate-x-1 transition-transform">→</span>}
                 </button>
                 <button className="w-full py-3.5 md:py-4 rounded-xl bg-[#151a15] hover:bg-[#1a211a] border border-white/5 text-white/90 font-bold text-xs md:text-[15px] transition-all flex items-center justify-center gap-2 group uppercase tracking-widest">
                   Syllabus

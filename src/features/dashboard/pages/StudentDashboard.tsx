@@ -7,6 +7,7 @@ import { upcomingClasses } from '../../live-class';
 import { QuestieForm } from '../../questies/components/QuestieForm';
 import { QuestieList } from '../../questies/components/QuestieList';
 import { DashboardHeader } from '../components/DashboardHeader';
+import { MyCourses } from '../components/MyCourses';
 import { HelpCircle } from 'lucide-react';
 
 const StudentDashboard = () => {
@@ -217,8 +218,12 @@ const StudentDashboard = () => {
           </div>
         )}
 
+        {activeTab === 'my-courses' && (
+          <MyCourses />
+        )}
+
         {/* Other tabs placeholders */}
-        {activeTab !== 'overview' && (
+        {activeTab !== 'overview' && activeTab !== 'my-courses' && activeTab !== 'questies' && (
           <div className="card p-10 md:p-20 text-center">
             <div className="w-16 h-16 md:w-20 md:h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white/20">
               {activeTab === 'my-courses' ? <Book size={32} /> : activeTab === 'study-materials' ? <FileText size={32} /> : <Calendar size={32} />}

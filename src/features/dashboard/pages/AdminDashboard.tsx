@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { adminStats } from '../';
 import { CourseManager } from '../components/CourseManager';
 import { StudentDirectory } from '../components/StudentDirectory';
+import { EnrollmentManager } from '../components/EnrollmentManager';
+import { FinanceManager } from '../components/FinanceManager';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
@@ -98,6 +100,16 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="flex flex-col gap-6 mb-8">
+              <div className="flex justify-between items-end mb-2">
+                <div>
+                  <h2 className="text-2xl font-display font-black text-gray-800">Pending Approvals</h2>
+                  <p className="text-sm text-gray-500">Review and verify new enrollment requests.</p>
+                </div>
+              </div>
+              <EnrollmentManager />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
@@ -277,8 +289,21 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Finance / Fees Tab */}
+        {activeTab === 'finance' && (
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-end mb-2">
+              <div>
+                <h2 className="text-2xl font-display font-black text-gray-800">Finance & Fee Ledger</h2>
+                <p className="text-sm text-gray-500">Record payments and manage student outstanding balances.</p>
+              </div>
+            </div>
+            <FinanceManager />
+          </div>
+        )}
+
         {/* Other tabs placeholders */}
-        {activeTab !== 'overview' && activeTab !== 'live' && activeTab !== 'questies' && activeTab !== 'courses' && (
+        {activeTab !== 'overview' && activeTab !== 'live' && activeTab !== 'questies' && activeTab !== 'courses' && activeTab !== 'students' && activeTab !== 'finance' && (
           <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
             <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg-main)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--text-light)' }}>
               {activeTab === 'students' ? <Users size={32} /> : activeTab === 'courses' ? <BookOpen size={32} /> : <IndianRupee size={32} />}
