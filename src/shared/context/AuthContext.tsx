@@ -18,6 +18,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchProfile = async (id: string, email: string) => {
+    const profile = await getProfile(id, email);
+    if (profile) setUser(profile);
+    setIsLoading(false);
+  };
+
   // Sync session from Supabase
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -68,11 +74,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return null;
   };
 
-  const fetchProfile = async (id: string, email: string) => {
-    const profile = await getProfile(id, email);
-    if (profile) setUser(profile);
-    setIsLoading(false);
-  };
 
   const login = useCallback(async (email: string, password: string, requiredRole?: UserRole) => {
     setIsLoading(true);

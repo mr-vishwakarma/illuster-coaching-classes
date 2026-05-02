@@ -10,10 +10,6 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) fetchQuesties();
-  }, [user, refreshTrigger]);
-
   const fetchQuesties = async () => {
     try {
       const { data, error } = await supabase
@@ -30,6 +26,11 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) fetchQuesties();
+  }, [user, refreshTrigger]);
+
 
   if (isLoading) {
     return (
