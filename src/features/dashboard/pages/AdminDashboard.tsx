@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Users, BookOpen, IndianRupee, AlertCircle, Plus, Edit, ArrowUpRight, ArrowDownRight, Video, PlayCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { adminStats } from '../';
-import { courses } from '../../courses';
+import { CourseManager } from '../components/CourseManager';
+import { StudentDirectory } from '../components/StudentDirectory';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
@@ -247,8 +248,49 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Student Management Tab */}
+        {activeTab === 'students' && (
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-end mb-2">
+              <div>
+                <h2 className="text-2xl font-display font-black text-gray-800">Student Directory</h2>
+                <p className="text-sm text-gray-500">Manage student records and assign classroom batches.</p>
+              </div>
+            </div>
+            <StudentDirectory />
+          </div>
+        )}
+
+        {/* Course Management Tab */}
+        {activeTab === 'courses' && (
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-between items-end mb-2">
+              <div>
+                <h2 className="text-2xl font-display font-black text-gray-800">Course Management</h2>
+                <p className="text-sm text-gray-500">
+                  {user?.role === 'admin' 
+                    ? 'Create, edit, and manage your coaching programs.' 
+                    : 'View current coaching programs and batches.'}
+                </p>
+              </div>
+            </div>
+            
+            {user?.role === 'admin' ? (
+              <CourseManager />
+            ) : (
+              <div className="p-12 bg-gray-50 border-2 border-dashed border-light rounded-3xl text-center">
+                <BookOpen size={48} className="mx-auto text-gray-300 mb-4" />
+                <h3 className="text-lg font-bold text-gray-800 mb-2">Restricted Access</h3>
+                <p className="text-gray-400 max-w-md mx-auto">
+                  Only administrators have permission to modify the course catalog. Tutors can view course details through the main website.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Other tabs placeholders */}
-        {activeTab !== 'overview' && activeTab !== 'live' && (
+        {activeTab !== 'overview' && activeTab !== 'live' && activeTab !== 'questies' && activeTab !== 'courses' && (
           <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
             <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg-main)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--text-light)' }}>
               {activeTab === 'students' ? <Users size={32} /> : activeTab === 'courses' ? <BookOpen size={32} /> : <IndianRupee size={32} />}
