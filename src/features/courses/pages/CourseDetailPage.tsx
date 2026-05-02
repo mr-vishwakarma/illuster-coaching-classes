@@ -31,7 +31,7 @@ const CourseDetail = () => {
     // 2. Try to fetch from Supabase if id looks like a UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (id && uuidRegex.test(id)) {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('courses')
         .select('*')
         .eq('id', id)

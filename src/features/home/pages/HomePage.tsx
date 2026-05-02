@@ -24,7 +24,7 @@ const Home = () => {
   }, []);
 
   const fetchLiveCourses = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('courses')
       .select('*')
       .eq('is_published', true)
