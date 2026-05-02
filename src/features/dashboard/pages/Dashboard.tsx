@@ -5,7 +5,7 @@ import AdminDashboard from './AdminDashboard';
 const Dashboard = () => {
   const { role } = useAuth();
 
-  if (role === 'admin') {
+  if (role === 'admin' || role === 'tutor') {
     return <AdminDashboard />;
   }
 
