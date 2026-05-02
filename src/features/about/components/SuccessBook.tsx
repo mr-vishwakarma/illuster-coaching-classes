@@ -67,16 +67,21 @@ const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; bg?: string
   ({ children, bg = PAGE_BG }, ref) => (
     <div
       ref={ref}
-      style={{ background: bg, boxShadow: 'inset -3px 0 10px rgba(0,0,0,0.04)' }}
-      className="w-full h-full overflow-hidden select-none"
+      style={{ 
+        background: bg, 
+        boxShadow: 'inset -8px 0 20px rgba(0,0,0,0.06), inset 8px 0 20px rgba(255,255,255,0.3)',
+        border: '2px solid rgba(0,0,0,0.08)'
+      }}
+      className="w-full h-full overflow-hidden select-none relative"
     >
+      {/* Visual edge thickness for 'hardsolid' feel */}
+      <div className="absolute inset-y-0 right-0 w-[3px] bg-black/5 z-20"></div>
       {children}
     </div>
   )
 );
 Page.displayName = 'Page';
 
-/* ─────────────────────── Cover ──────────────────────────────  */
 const CoverPage = forwardRef<HTMLDivElement>((_, ref) => (
   <Page ref={ref} bg="#cfc9ed">
     <div className="w-full h-full flex flex-col items-center justify-center p-8 relative">
@@ -289,10 +294,9 @@ const SuccessBook = () => {
   const totalPages = 2 + pages.length + 1; // cover + index + content + back
 
   /**
-   * 🔊 Sound path: /public/sounds/page-flip.mp3
-   * Drop your MP3 file at:  public/sounds/page-flip.mp3
+   * 🔊 Sound path fixed
    */
-  const [playFlip] = useSound('/sounds/page-flip.mp3', { volume: 0.65 });
+  const [playFlip] = useSound('/sounds/oxidvideos-page-flip2-178323.mp3', { volume: 0.65 });
 
   const flip = (dir: 'next' | 'prev') => {
     playFlip();
@@ -339,16 +343,16 @@ const SuccessBook = () => {
         {/* ── salmon-border frame ── */}
         <div
           style={{
-            border: `8px solid ${BORDER_CLR}`,
-            borderRadius: '18px',
-            padding: '10px',
+            border: `12px solid ${BORDER_CLR}`,
+            borderRadius: '22px',
+            padding: '12px',
             background: '#d4956a',
-            boxShadow: '0 30px 70px -15px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.12)',
+            boxShadow: '0 40px 100px -20px rgba(0,0,0,0.35), 0 15px 40px rgba(0,0,0,0.15)',
             position: 'relative',
           }}
         >
-          {/* inner white mat around the book */}
-          <div style={{ borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
+          {/* inner container */}
+          <div style={{ borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
 
             {/* spiral binding overlay */}
             <SpiralBinding />
@@ -356,18 +360,18 @@ const SuccessBook = () => {
             {/* @ts-expect-error react-pageflip types */}
             <HTMLFlipBook
               ref={bookRef}
-              width={310}
-              height={430}
+              width={420}
+              height={580}
               size="fixed"
-              minWidth={220}
-              maxWidth={460}
-              minHeight={300}
-              maxHeight={580}
+              minWidth={300}
+              maxWidth={500}
+              minHeight={400}
+              maxHeight={750}
               showCover
               mobileScrollSupport
               onFlip={onFlip}
               drawShadow
-              flippingTime={750}
+              flippingTime={800}
               startPage={0}
               usePortrait={false}
               startZIndex={10}
