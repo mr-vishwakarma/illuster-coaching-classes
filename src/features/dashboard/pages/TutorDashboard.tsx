@@ -54,20 +54,24 @@ const TutorDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 lg:ml-64 p-6 lg:p-10">
         
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <Link 
-              to="/" 
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-primary transition-colors mb-4 group"
-            >
-              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Back to Home</span>
-            </Link>
-            <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', margin: 0, color: 'var(--text-main)' }}>
-              Tutor Dashboard
-            </h1>
-          </div>
-          <div className="flex gap-3 mt-4">
+        <div className="flex justify-between items-center mb-8 border-b border-light pb-6">
+          <Link to="/" className="hover:opacity-80 transition-opacity">
+            <img src="/logo.png" alt="Illuster" className="h-8 md:h-10 w-auto" />
+          </Link>
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-primary transition-colors group"
+          >
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Back to Home</span>
+          </Link>
+        </div>
+
+        <div className="flex justify-between items-center mb-8">
+          <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', margin: 0, color: 'var(--text-main)' }}>
+            Tutor Dashboard
+          </h1>
+          <div className="flex gap-3">
             <button className="btn btn-secondary flex items-center gap-2">
               <AlertCircle size={18} /> Announcements
             </button>
