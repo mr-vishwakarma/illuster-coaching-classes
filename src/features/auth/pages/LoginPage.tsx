@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AlertCircle, ArrowRight, User, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ArrowRight, User, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { toast } from 'react-toastify';
 

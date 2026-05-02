@@ -8,7 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   role: UserRole | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; user?: User }>;
   logout: () => Promise<void>;
 }
 
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (id: string, email: string) => {
+  const getProfile = async (id: string, email: string): Promise<User | null> => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -53,34 +53,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       if (data) {
-        setUser({
+        return {
           id,
           email,
           name: data.full_name || email.split('@')[0],
           role: data.role as UserRole,
           avatar: data.avatar_url || '👤',
-          password: '', // Not stored in client
-          enrolledCourses: [], // Fetch these separately later
+          password: '',
+          enrolledCourses: [],
           joinDate: new Date().toLocaleDateString(),
-        });
+        };
       }
     } catch (err) {
       console.error('Error fetching profile:', err);
-    } finally {
-      setIsLoading(false);
     }
+    return null;
+  };
+
+  const fetchProfile = async (id: string, email: string) => {
+    const profile = await getProfile(id, email);
+    if (profile) setUser(profile);
+    setIsLoading(false);
   };
 
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
       setIsLoading(false);
       return { success: false, error: error.message };
     }
     
-    // fetchProfile will be called by onAuthStateChange trigger
+    if (data.user) {
+      const profile = await getProfile(data.user.id, data.user.email!);
+      if (profile) {
+        setUser(profile);
+        setIsLoading(false);
+        return { success: true, user: profile };
+      }
+    }
+    
     return { success: true };
   }, []);
 
