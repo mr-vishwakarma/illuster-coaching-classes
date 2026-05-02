@@ -7,6 +7,7 @@ import { StudentDirectory } from '../components/StudentDirectory';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
+import { DashboardHeader } from '../components/DashboardHeader';
 import { HelpCircle } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -19,7 +20,7 @@ const AdminDashboard = () => {
     <div style={{ paddingTop: '4.5rem', backgroundColor: 'var(--bg-main)', minHeight: '100vh', display: 'flex' }}>
       
       {/* Sidebar Admin Menu - Desktop */}
-      <div className="hidden lg:flex flex-col w-64 bg-white border-r border-light fixed h-full z-20" style={{ top: '4.5rem', paddingTop: '2rem' }}>
+      <div className="hidden lg:flex flex-col w-64 bg-[var(--bg-card)] border-r border-[var(--border-light)] fixed h-full z-20" style={{ top: '4.5rem', paddingTop: '2rem' }}>
         <div className="px-6 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary-dark text-white flex items-center justify-center font-bold">
@@ -63,18 +64,7 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <div className="flex-1 lg:ml-64 p-6 lg:p-10">
         
-        <div className="flex justify-between items-center mb-8 border-b border-light pb-6">
-          <Link to="/" className="hover:opacity-80 transition-opacity">
-            <img src="/logo.png" alt="Illuster" className="h-8 md:h-10 w-auto" />
-          </Link>
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-primary transition-colors group"
-          >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Back to Home</span>
-          </Link>
-        </div>
+        <DashboardHeader />
 
         <div className="flex justify-between items-center mb-8">
           <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', margin: 0, color: 'var(--text-main)' }}>

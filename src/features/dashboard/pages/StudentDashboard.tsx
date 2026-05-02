@@ -6,6 +6,7 @@ import { courses, studyMaterials } from '../../courses';
 import { upcomingClasses } from '../../live-class';
 import { QuestieForm } from '../../questies/components/QuestieForm';
 import { QuestieList } from '../../questies/components/QuestieList';
+import { DashboardHeader } from '../components/DashboardHeader';
 import { HelpCircle } from 'lucide-react';
 
 const StudentDashboard = () => {
@@ -28,18 +29,9 @@ const StudentDashboard = () => {
       {/* Dashboard Header */}
       <div className="bg-[#050505] text-white pt-10 pb-8 md:pb-14 border-b border-white/5">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex justify-between items-center mb-8">
-            <Link to="/" className="hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="Illuster" className="h-8 md:h-10 w-auto" />
-            </Link>
-            <Link 
-              to="/" 
-              className="inline-flex items-center gap-2 text-white/40 hover:text-orange-500 transition-colors group"
-            >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              <span className="text-xs font-black uppercase tracking-widest">Back to Home</span>
-            </Link>
-          </div>
+      <div className="container mx-auto px-4 md:px-6 mb-4">
+        <DashboardHeader />
+      </div>
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white text-black flex items-center justify-center font-display text-2xl md:text-3xl font-bold shadow-xl">
               {user?.avatar}
