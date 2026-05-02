@@ -4,7 +4,7 @@ import useSound from 'use-sound';
 import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
 
 /* ─────────────────────── palette ─────────────────────────── */
-const PAGE_BG    = '#8a76ffff';   // unified book page colour (user's request)
+const PAGE_BG    = '#8a76ff';   // simplified to 6-digit for reliability
 const ACCENT     = '#3500e4ff';   
 const DARK_TXT   = '#2D2B3D';
 const BORDER_CLR = '#ff802bff';   
@@ -39,16 +39,16 @@ const SpiralBinding = () => {
               {/* ring body */}
               <rect x={0} y={y} width={28} height={ringH} rx={6}
                     fill="url(#ringGrad)" stroke="#c8c0e0" strokeWidth={0.8} />
-              {/* inner window to create coil effect */}
+              {/* inner window to create coil effect matches page color */}
               <rect x={6} y={y + 4} width={16} height={ringH - 8} rx={3}
-                    fill="#e2dff3" opacity={0.7} />
+                    fill={PAGE_BG} opacity={0.8} />
             </g>
           );
         })}
         <defs>
           <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stopColor="#d8d0f0" />
-            <stop offset="40%"  stopColor="#f0eeff" />
+            <stop offset="0%"   stopColor="#a391d8ff" />
+            <stop offset="40%"  stopColor="#433d6eff" />
             <stop offset="70%"  stopColor="#c8bfe8" />
             <stop offset="100%" stopColor="#b8b0d8" />
           </linearGradient>
@@ -309,7 +309,7 @@ const SuccessBook = () => {
 
   return (
     /* outer section – background: #e5e5e5 */
-    <div className="py-20 overflow-hidden" style={{ background: '#e5e5e5' }}>
+    <div className="py-20 overflow-hidden" style={{ background: '#e5e5e5ff' }}>
 
       {/* header */}
       <div className="container mx-auto px-6 text-center mb-14">
@@ -342,7 +342,7 @@ const SuccessBook = () => {
             border: `12px solid ${BORDER_CLR}`,
             borderRadius: '22px',
             padding: '12px',
-            background: '#d4956a',
+            background: BORDER_CLR,
             boxShadow: '0 40px 100px -20px rgba(0,0,0,0.35), 0 15px 40px rgba(0,0,0,0.15)',
             position: 'relative',
           }}
