@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Video, FileText, CheckCircle, Clock, IndianRupee } from 'lucide-react';
+import { BookOpen, Video, Clock } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { Link } from 'react-router-dom';
