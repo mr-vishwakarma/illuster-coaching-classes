@@ -4,14 +4,13 @@ import useSound from 'use-sound';
 import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
 
 /* ─────────────────────── palette ─────────────────────────── */
-const PAGE_BG    = '#e2dff3';   // unified book page colour (user's request)
-const ACCENT     = '#9B8EC4';   // deep lavender accent
+const PAGE_BG    = '#8a76ffff';   // unified book page colour (user's request)
+const ACCENT     = '#3500e4ff';   
 const DARK_TXT   = '#2D2B3D';
 const SLATE_TXT  = '#4A4458';
-const DUSTY_ROSE = '#E8C9C0';
+const DUSTY_ROSE = '#100f0fff';
 const SAGE       = '#C8D8C0';
-const BORDER_CLR = '#D4956A';   // salmon/peach border  (from reference image)
-
+const BORDER_CLR = '#ff802bff';   
 /* ─────────────────────── Spiral Binding ─────────────────────
    Absolutely-positioned SVG rendered OVER the book spread.
    Each ring is a rounded rectangle (like the metal coil photo).   */
@@ -83,26 +82,26 @@ const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; bg?: string
 Page.displayName = 'Page';
 
 const CoverPage = forwardRef<HTMLDivElement>((_, ref) => (
-  <Page ref={ref} bg="#cfc9ed">
+  <Page ref={ref} bg={PAGE_BG}>
     <div className="w-full h-full flex flex-col items-center justify-center p-8 relative">
-      <div style={{ color: ACCENT }} className="mb-4 opacity-60">
+      <div style={{ color: 'white' }} className="mb-4 opacity-80">
         <BookOpen size={44} strokeWidth={1.2} />
       </div>
-      <p style={{ color: ACCENT, letterSpacing: '0.4em', fontSize: 9 }}
-         className="font-bold uppercase mb-3">
+      <p style={{ color: 'white', letterSpacing: '0.4em', fontSize: 9 }}
+         className="font-bold uppercase mb-3 opacity-90">
         ILLUSTER COACHING CLASSES
       </p>
-      <h1 style={{ color: DARK_TXT, lineHeight: 1.05 }}
+      <h1 style={{ color: 'white', lineHeight: 1.05 }}
           className="text-4xl font-black text-center mb-4 tracking-tighter">
         THE&nbsp;SUCCESS<br/>DIARY
       </h1>
-      <div style={{ background: BORDER_CLR }} className="h-0.5 w-14 mb-4 rounded-full opacity-70" />
-      <p style={{ color: SLATE_TXT }} className="text-[11px] font-medium tracking-widest uppercase">
+      <div style={{ background: BORDER_CLR }} className="h-0.5 w-14 mb-4 rounded-full" />
+      <p style={{ color: 'white' }} className="text-[11px] font-medium tracking-widest uppercase opacity-80">
         Annual Edition 2024
       </p>
-      <div style={{ background: DUSTY_ROSE, opacity: 0.4 }}
+      <div style={{ background: 'white', opacity: 0.2 }}
            className="absolute top-5 right-5 w-14 h-14 rounded-full blur-xl" />
-      <div style={{ background: SAGE, opacity: 0.4 }}
+      <div style={{ background: ACCENT, opacity: 0.3 }}
            className="absolute bottom-8 left-6 w-10 h-10 rounded-full blur-xl" />
     </div>
   </Page>
@@ -122,8 +121,8 @@ const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
     <Page ref={ref} bg={PAGE_BG}>
       <div className="p-8 h-full flex flex-col">
         <div className="flex items-center gap-2 mb-6">
-          <List size={18} style={{ color: ACCENT }} />
-          <h2 style={{ color: DARK_TXT }} className="text-xl font-black tracking-tight">
+          <List size={18} style={{ color: 'white' }} />
+          <h2 style={{ color: 'white' }} className="text-xl font-black tracking-tight">
             Table of Contents
           </h2>
         </div>
@@ -132,27 +131,27 @@ const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
             <button
               key={ch.num}
               onClick={() => onJump(ch.page)}
-              style={{ background: '#d6d1ee', borderLeft: `4px solid ${ACCENT}` }}
-              className="w-full text-left px-4 py-3 rounded-xl hover:brightness-95 transition-all group"
+              style={{ background: 'rgba(255,255,255,0.1)', borderLeft: `4px solid ${BORDER_CLR}` }}
+              className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/20 transition-all group"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p style={{ color: ACCENT, fontSize: 9 }}
-                     className="font-black uppercase tracking-widest mb-0.5">
+                  <p style={{ color: 'white', fontSize: 9 }}
+                     className="font-black uppercase tracking-widest mb-0.5 opacity-80">
                     Chapter {ch.num}
                   </p>
-                  <h3 style={{ color: DARK_TXT }} className="text-base font-black">{ch.title}</h3>
-                  <p style={{ color: SLATE_TXT }} className="text-[10px] font-medium">{ch.subtitle}</p>
+                  <h3 style={{ color: 'white' }} className="text-base font-black">{ch.title}</h3>
+                  <p style={{ color: 'white' }} className="text-[10px] font-medium opacity-60">{ch.subtitle}</p>
                 </div>
-                <span style={{ color: ACCENT }}
-                      className="text-2xl font-black opacity-25 group-hover:opacity-50 transition-opacity">
+                <span style={{ color: 'white' }}
+                      className="text-2xl font-black opacity-20 group-hover:opacity-40 transition-opacity">
                   {String(ch.page).padStart(2, '0')}
                 </span>
               </div>
             </button>
           ))}
         </div>
-        <p style={{ color: '#a09ac0', fontSize: 9 }} className="text-center tracking-widest uppercase mt-4">
+        <p style={{ color: 'white', fontSize: 9 }} className="text-center tracking-widest uppercase mt-4 opacity-40">
           Flip pages to explore →
         </p>
       </div>
@@ -230,35 +229,35 @@ const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number
     <Page ref={ref} bg={PAGE_BG}>
       <div className="w-full h-full flex flex-col p-7 gap-3">
         <div className="flex items-center justify-between">
-          <p style={{ color: data.accent, fontSize: 8 }} className="font-black uppercase tracking-[0.35em]">
+          <p style={{ color: 'white', fontSize: 8 }} className="font-black uppercase tracking-[0.35em] opacity-80">
             {data.chapter}
           </p>
           {data.tag && (
-            <span style={{ background: data.accent + '22', color: data.accent, fontSize: 8 }}
+            <span style={{ background: 'rgba(255,255,255,0.2)', color: 'white', fontSize: 8 }}
                   className="px-2 py-0.5 rounded-full font-black uppercase tracking-widest">
               {data.tag}
             </span>
           )}
         </div>
 
-        <div className="relative w-full rounded-xl overflow-hidden flex-1 max-h-[44%]">
+        <div className="relative w-full rounded-xl overflow-hidden flex-1 max-h-[44%] shadow-lg">
           <img src={data.imageUrl} alt={data.imageLabel} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
           <p style={{ fontSize: 8 }}
-             className="absolute bottom-2 left-3 text-white/80 font-black uppercase tracking-widest">
+             className="absolute bottom-2 left-3 text-white/90 font-black uppercase tracking-widest">
             {data.imageLabel}
           </p>
         </div>
 
-        <div style={{ background: data.accent }} className="h-px w-8 rounded-full opacity-40" />
-        <h2 style={{ color: DARK_TXT, lineHeight: 1.1 }} className="text-xl font-black tracking-tight">
+        <div style={{ background: 'white' }} className="h-px w-8 rounded-full opacity-30" />
+        <h2 style={{ color: 'white', lineHeight: 1.1 }} className="text-xl font-black tracking-tight">
           {data.title}
         </h2>
-        <p style={{ color: SLATE_TXT }} className="text-[11px] leading-relaxed flex-1">
+        <p style={{ color: 'white' }} className="text-[11px] leading-relaxed flex-1 opacity-80">
           {data.body}
         </p>
-        <p style={{ color: data.accent, fontSize: 8 }}
-           className="font-black uppercase tracking-widest text-right opacity-40">
+        <p style={{ color: 'white', fontSize: 8 }}
+           className="font-black uppercase tracking-widest text-right opacity-30">
           {String(pageNum).padStart(2, '0')}
         </p>
       </div>
