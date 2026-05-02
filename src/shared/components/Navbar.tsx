@@ -80,13 +80,13 @@ const Navbar = () => {
 
         {/* Row 2: Navigation Links */}
         <div className="w-full flex justify-center">
-          <div className="flex items-center gap-2 sm:gap-4 md:gap-8 bg-[#111111]/80 backdrop-blur-md border border-[#2A2A2A] rounded-full px-4 sm:px-6 md:px-10 py-2 md:py-3 w-full justify-around sm:justify-center overflow-x-auto scrollbar-hide shadow-inner shadow-white/5">
+          <div className="flex items-center gap-3 sm:gap-6 md:gap-10 bg-[#111111]/80 backdrop-blur-md border border-[#2A2A2A] rounded-full px-5 sm:px-8 md:px-12 py-2.5 md:py-3.5 w-full justify-around sm:justify-center overflow-x-auto scrollbar-hide shadow-inner shadow-white/5">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`text-[10px] sm:text-xs md:text-sm font-medium whitespace-nowrap transition-all hover:scale-105 ${
-                  location.pathname === link.path ? 'text-white' : 'text-[#888888] hover:text-white'
+                className={`text-[13px] sm:text-sm md:text-base font-bold whitespace-nowrap transition-all hover:scale-110 ${
+                  location.pathname === link.path ? 'text-white underline underline-offset-8' : 'text-[#888888] hover:text-white'
                 }`}
               >
                 {link.name}

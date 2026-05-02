@@ -281,7 +281,7 @@ const SuccessBook = () => {
   const [isMobile, setIsMobile] = useState(false);
   const totalPages = 2 + pages.length + 1; 
 
-  const [playFlip] = useSound('/sounds/dragon-studio-flipping-book-page-499646.mp3', { volume: 0.85 });
+  const [playFlip] = useSound('/sounds/dragon-studio-flipping-book-page-499646.mp3', { volume: 0.65 });
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
