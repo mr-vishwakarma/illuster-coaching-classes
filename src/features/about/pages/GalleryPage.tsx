@@ -3,6 +3,7 @@ import { Camera, ArrowLeft, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TopperSwipeCarousel from '../../testimonials/components/TopperSwipeCarousel';
 import StudentScrollReveal from '../components/StudentScrollReveal';
+import SuccessBook from '../components/SuccessBook';
 
 const Gallery = () => {
   const images = [
@@ -47,6 +48,11 @@ const Gallery = () => {
             <p className="max-w-[200px] text-sm md:text-base">A glimpse into our academic environment and vibrant culture.</p>
           </motion.div>
         </div>
+
+        {/* 3D Success Book Section */}
+        <section className="mb-24 md:mb-40">
+          <SuccessBook />
+        </section>
 
         {/* Toppers Section */}
         <section className="mb-20 md:mb-32">
