@@ -7,9 +7,6 @@ import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
 const PAGE_BG    = '#8a76ffff';   // unified book page colour (user's request)
 const ACCENT     = '#3500e4ff';   
 const DARK_TXT   = '#2D2B3D';
-const SLATE_TXT  = '#4A4458';
-const DUSTY_ROSE = '#100f0fff';
-const SAGE       = '#C8D8C0';
 const BORDER_CLR = '#ff802bff';   
 /* ─────────────────────── Spiral Binding ─────────────────────
    Absolutely-positioned SVG rendered OVER the book spread.
