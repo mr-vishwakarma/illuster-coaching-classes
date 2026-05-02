@@ -169,8 +169,8 @@ const StickyCardStack = ({
                   <div className="flex items-center gap-6 mt-auto">
                     <div>
                       <span className="text-sm text-[var(--text-muted)] block mb-1">Price</span>
-                      <span className="text-3xl font-black text-white">₹{course.price.toLocaleString('en-IN')}</span>
-                      <span className="text-sm text-[var(--text-light)] line-through ml-2">₹{course.originalPrice.toLocaleString('en-IN')}</span>
+                      <span className="text-3xl font-black text-white">₹{(course.price || 0).toLocaleString('en-IN')}</span>
+                      <span className="text-sm text-[var(--text-light)] line-through ml-2">₹{(course.originalPrice || 0).toLocaleString('en-IN')}</span>
                     </div>
                     <Link to={`/courses/${course.id}`} className="ml-auto px-8 py-4 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-all flex items-center gap-2">
                       Check Course <ArrowRight size={20} />

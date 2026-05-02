@@ -139,10 +139,10 @@ const Courses = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 md:mb-6 gap-1 sm:gap-2">
                       <div className="flex items-baseline gap-1.5 md:gap-2">
                         <span className="text-white text-[10px] md:text-lg">Price</span>
-                        <span className="text-orange-500 text-sm sm:text-xl md:text-3xl font-bold">₹{course.price.toLocaleString('en-IN')}</span>
+                        <span className="text-orange-500 text-sm sm:text-xl md:text-3xl font-bold">₹{(course.price || 0).toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-white/40 text-[8px] md:text-sm line-through">₹{course.originalPrice.toLocaleString('en-IN')}</span>
+                        <span className="text-white/40 text-[8px] md:text-sm line-through">₹{(course.originalPrice || 0).toLocaleString('en-IN')}</span>
                         <span className="bg-white text-black text-[7px] md:text-[10px] font-black px-1.5 py-0.5 md:px-2 md:py-1 rounded">
                           {Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}%
                         </span>

@@ -102,8 +102,8 @@ const CourseCardStack = ({ courses }: CourseCardStackProps) => {
                 
                 <div className="flex items-center justify-between pt-6 border-t border-[var(--border-light)] mt-auto">
                   <div>
-                    <span className="text-2xl font-black text-[var(--text-main)]">₹{course.price.toLocaleString('en-IN')}</span>
-                    <span className="text-sm text-[var(--text-light)] line-through ml-2">₹{course.originalPrice.toLocaleString('en-IN')}</span>
+                    <span className="text-2xl font-black text-[var(--text-main)]">₹{(course.price || 0).toLocaleString('en-IN')}</span>
+                    <span className="text-sm text-[var(--text-light)] line-through ml-2">₹{(course.originalPrice || 0).toLocaleString('en-IN')}</span>
                   </div>
                   {isTop && (
                     <Link to={`/courses/${course.id}`} className="p-3 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-md">
