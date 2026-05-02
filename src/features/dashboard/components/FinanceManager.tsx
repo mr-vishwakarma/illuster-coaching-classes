@@ -71,24 +71,7 @@ export const FinanceManager = () => {
 
     setIsLoading(true);
     
-    // 1. Update Student Profile First
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({
-        full_name: studentDetails.full_name,
-        email: studentDetails.email,
-        phone: studentDetails.phone,
-        address: studentDetails.address
-      })
-      .eq('id', studentDetails.id);
-
-    if (profileError) {
-      toast.error("Failed to update student profile");
-      setIsLoading(false);
-      return;
-    }
-
-    // 2. Insert Payment Record
+    // Insert Payment Record
     const { error } = await supabase
       .from('fee_payments')
       .insert([
@@ -265,62 +248,44 @@ export const FinanceManager = () => {
               <h2 className="text-2xl font-display font-black text-gray-800 mb-1">Record Fee Payment</h2>
               <p className="text-sm text-gray-500 mb-6">Enter payment details for <span className="font-bold text-primary">{selectedEnrollment.student.full_name}</span></p>
 
-              <form onSubmit={handleAddPayment} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
-                {/* Student Verification Fields */}
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-light mt-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Student Name</label>
-                    <input 
-                      required
-                      className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
-                      value={studentDetails.full_name}
-                      onChange={(e) => setStudentDetails({...studentDetails, full_name: e.target.value})}
-                    />
+              <form onSubmit={handleAddPayment} className="space-y-6">
+                {/* Student Info Summary */}
+                <div className="bg-gray-50 rounded-2xl p-4 border border-light">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Student Details</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Name</span>
+                      <span className="font-bold text-gray-800">{studentDetails.full_name}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Mobile</span>
+                      <span className="font-bold text-gray-800">{studentDetails.phone || 'Not provided'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Email</span>
+                      <span className="font-bold text-gray-800">{studentDetails.email || 'Not provided'}</span>
+                    </div>
+                    {studentDetails.address && (
+                      <div className="pt-2 mt-2 border-t border-light text-[10px] text-gray-400 italic">
+                        {studentDetails.address}
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mobile Number</label>
-                    <input 
-                      required
-                      className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
-                      value={studentDetails.phone}
-                      onChange={(e) => setStudentDetails({...studentDetails, phone: e.target.value})}
-                    />
-                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Email Address</label>
-                  <input 
-                    required
-                    type="email"
-                    className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
-                    value={studentDetails.email}
-                    onChange={(e) => setStudentDetails({...studentDetails, email: e.target.value})}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Residential Address</label>
-                  <textarea 
-                    rows={2}
-                    className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
-                    value={studentDetails.address}
-                    onChange={(e) => setStudentDetails({...studentDetails, address: e.target.value})}
-                    placeholder="Student's permanent address..."
-                  />
-                </div>
-
-                <div className="pt-4 border-t border-light mt-4 space-y-4">
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-primary font-black">Amount Received (₹)</label>
                     <div className="relative">
                       <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={18} />
                       <input 
+                        autoFocus
                         required
                         type="number"
-                        className="w-full pl-12 pr-4 py-3 bg-primary/5 border border-primary/20 rounded-xl outline-none focus:border-primary font-black text-lg"
+                        className="w-full pl-12 pr-4 py-3 bg-primary/5 border border-primary/20 rounded-xl outline-none focus:border-primary font-black text-xl"
                         value={paymentAmount}
                         onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                        placeholder="0"
                       />
                     </div>
                   </div>
