@@ -1,7 +1,8 @@
 import { useRef, useState, forwardRef, useEffect } from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import useSound from 'use-sound';
-import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, List, Loader2 } from 'lucide-react';
+import { supabase } from '../../../shared/lib/supabase';
 
 const PAGE_BG    = '#8a76ffff';   
 const ACCENT     = '#3500e4ff';   
@@ -162,56 +163,7 @@ interface PageData {
   accent: string;
 }
 
-const pages: PageData[] = [
-  { side:'left',  chapter:'Chapter 01', title:'Est. 2012',
-    body:'Illuster was founded with a simple promise: every student deserves world-class guidance. Today, over 15,000 students have walked through our doors and emerged as toppers.',
-    imageUrl:'https://images.unsplash.com/photo-1523050337456-6814427b3d46?w=500&q=80',
-    imageLabel:'Founding Day', accent:ACCENT, tag:'Our Beginning' },
-  { side:'right', chapter:'Chapter 01', title:'100+ Centres',
-    body:'From a single classroom, Illuster now operates across 100+ study centres in 8 cities, bringing elite JEE and NEET coaching closer to every aspiring student.',
-    imageUrl:'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80',
-    imageLabel:'Expansion', accent:ACCENT, tag:'Growth' },
-  { side:'left',  chapter:'Chapter 01', title:'Best Institute Award',
-    body:'Recognized 12 times by leading education bodies for outstanding academic results and student satisfaction scores above 97%.',
-    imageUrl:'https://images.unsplash.com/photo-1524178232363-1fb28f74b671?w=500&q=80',
-    imageLabel:'Award Ceremony', accent:ACCENT, tag:'Recognition' },
-  { side:'right', chapter:'Chapter 01', title:'Modern Classrooms',
-    body:'Cutting-edge infrastructure with air-conditioned rooms, smart boards, high-speed labs, and live-session recording for every batch.',
-    imageUrl:'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&q=80',
-    imageLabel:'Infrastructure', accent:ACCENT, tag:'Facilities' },
-  { side:'left',  chapter:'Chapter 02', title:'IIT-JEE AIR 42',
-    body:'Aryan Mehta cracked IIT-JEE with an All India Rank of 42 after 2 years at Illuster. His secret? Consistent doubt sessions and our legendary test series.',
-    imageUrl:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&q=80',
-    imageLabel:'Aryan Mehta – AIR 42', accent:'#A0584A', tag:'Hall of Fame' },
-  { side:'right', chapter:'Chapter 02', title:'NEET 710 / 720',
-    body:'Priya Sharma scored 710 in NEET, securing admission to AIIMS Delhi. Her journey at Illuster is a testament to discipline and structured learning.',
-    imageUrl:'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=500&q=80',
-    imageLabel:'Priya Sharma – NEET 710', accent:ACCENT, tag:'Medical Topper' },
-  { side:'left',  chapter:'Chapter 02', title:'NTSE Scholars',
-    body:'Over 340 students cleared NTSE from Illuster batches in 2024 alone, placing us among the top 5 institutes nationally for NTSE coaching.',
-    imageUrl:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&q=80',
-    imageLabel:'NTSE Batch 2024', accent:'#4A7C59', tag:'Scholarship' },
-  { side:'right', chapter:'Chapter 02', title:'Olympiad Gold',
-    body:'International Science Olympiad gold medalists trained exclusively at Illuster, showcasing our reach beyond national competitive exams.',
-    imageUrl:'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=500&q=80',
-    imageLabel:'Olympiad Winners', accent:ACCENT, tag:'Global' },
-  { side:'left',  chapter:'Chapter 03', title:'Hi-Tech Labs',
-    body:'State-of-the-art physics, chemistry and biology labs designed for hands-on learning, reinforcing concepts that textbooks alone cannot teach.',
-    imageUrl:'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500&q=80',
-    imageLabel:'Science Lab', accent:ACCENT, tag:'Infrastructure' },
-  { side:'right', chapter:'Chapter 03', title:'24/7 Library',
-    body:'A curated library with 10,000+ books, e-resources, and silent study pods available around the clock for every enrolled student.',
-    imageUrl:'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=500&q=80',
-    imageLabel:'Library', accent:ACCENT, tag:'Resources' },
-  { side:'left',  chapter:'Chapter 03', title:'Live Portal',
-    body:'Our proprietary EdTech platform enables live classes, recorded lectures, AI-powered doubt resolution, and personalised progress analytics.',
-    imageUrl:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80',
-    imageLabel:'Student Portal', accent:ACCENT, tag:'Technology' },
-  { side:'right', chapter:'Chapter 03', title:'Testing App',
-    body:'Weekly adaptive mock tests, chapter-wise DPPs, and all-India ranking simulations prepare our students for exam-day performance like no other.',
-    imageUrl:'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80',
-    imageLabel:'Assessment Suite', accent:ACCENT, tag:'Practice' },
-];
+// Static pages removed - now fetching from Supabase 'success_diary' table
 
 const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number }>(
   ({ data, pageNum }, ref) => (
@@ -275,6 +227,8 @@ BackCover.displayName = 'BackCover';
 
 const SuccessBook = () => {
   const bookRef = useRef<any>(null);
+  const [pages, setPages] = useState<PageData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const totalPages = 2 + pages.length + 1; 
@@ -285,8 +239,36 @@ const SuccessBook = () => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     handleResize();
     window.addEventListener('resize', handleResize);
+    fetchDiaryPages();
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const fetchDiaryPages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('success_diary')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+      if (data) {
+        setPages(data.map((p, idx) => ({
+          side: idx % 2 === 0 ? 'left' : 'right',
+          chapter: p.chapter,
+          title: p.title,
+          body: p.body,
+          tag: p.tag,
+          imageUrl: p.image_url,
+          imageLabel: p.image_label,
+          accent: p.accent_color || ACCENT
+        })));
+      }
+    } catch (err) {
+      console.error('Error fetching diary:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const flip = (dir: 'next' | 'prev') => {
     playFlip();
@@ -300,6 +282,15 @@ const SuccessBook = () => {
   };
 
   const onFlip = (e: { data: number }) => setCurrentPage(e.data);
+
+  if (isLoading) {
+    return (
+      <div className="py-20 flex flex-col items-center justify-center min-h-[500px]" style={{ background: '#e5e5e5' }}>
+        <Loader2 className="animate-spin text-[#3500e4ff] mb-4" size={48} />
+        <p className="text-[#2D2B3D] font-bold animate-pulse tracking-widest uppercase text-xs">Opening the Success Diary...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="py-12 md:py-20 overflow-hidden" style={{ background: '#e5e5e5ff' }}>
