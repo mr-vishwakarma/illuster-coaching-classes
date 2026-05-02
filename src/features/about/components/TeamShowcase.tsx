@@ -7,7 +7,7 @@ const teamMembers = [
     id: 1,
     name: "Ashish Solanki",
     role: "Founder & Chairman",
-    image: "/src/assets/images/team/founder.png",
+    image: "/images/team/founder.png",
     bio: "Ashish Solanki has over 20 years of experience in the education sector. He founded Illuster with a vision to provide high-quality, accessible coaching for competitive exams. His leadership has guided thousands of students to success in JEE and NEET.",
     highlights: ["PhD in Physics", "20+ Years Experience", "Visionary Leader"]
   },
@@ -15,7 +15,7 @@ const teamMembers = [
     id: 2,
     name: "Abhishek Soni",
     role: "Managing Director",
-    image: "/src/assets/images/team/director.png",
+    image: "/images/team/director.png",
     bio: "Abhishek Soni oversees the strategic direction and operations at Illuster. With a background in management and a passion for education, she ensures that our students receive the best resources and support to excel in their academic journeys.",
     highlights: ["MBA from IIM", "Operational Excellence", "Student-Centric Approach"]
   },
@@ -23,7 +23,7 @@ const teamMembers = [
     id: 3,
     name: "Rahul Sharma",
     role: "Co-Founder & CTO",
-    image: "/src/assets/images/team/cofounder.png",
+    image: "/images/team/cofounder.png",
     bio: "Rahul Sharma is the tech visionary behind Illuster's digital platform. He leads our technology team to create innovative learning tools, including our interactive live classes and AI-driven assessment systems.",
     highlights: ["Tech Innovator", "Full Stack Developer", "AI Enthusiast"]
   },
@@ -31,7 +31,7 @@ const teamMembers = [
     id: 4,
     name: "Prof. Amit Verma",
     role: "Academic Head",
-    image: "/src/assets/images/team/academic_head.png",
+    image: "/images/team/academic_head.png",
     bio: "Prof. Amit Verma leads our academic department, ensuring that our curriculum is up-to-date and effective. He works closely with our mentors to deliver high-quality instruction and support to every student.",
     highlights: ["M.Tech from IIT", "Curriculum Specialist", "Expert Mentor"]
   }
