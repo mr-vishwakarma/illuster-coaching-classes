@@ -1,5 +1,5 @@
 import  { useState } from 'react';
-import { Book, PlayCircle, FileText, Calendar, Clock, Video, ArrowLeft } from 'lucide-react';
+import { Book, PlayCircle, FileText, Calendar, Clock, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { courses, studyMaterials } from '../../courses';

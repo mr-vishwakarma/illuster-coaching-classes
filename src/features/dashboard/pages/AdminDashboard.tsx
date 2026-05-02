@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, BookOpen, IndianRupee, AlertCircle, Plus, Edit, ArrowUpRight, ArrowDownRight, Video, PlayCircle, ArrowLeft } from 'lucide-react';
+import { Users, BookOpen, IndianRupee, AlertCircle, Plus, Edit, ArrowUpRight, ArrowDownRight, Video, PlayCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { adminStats } from '../';
 import { CourseManager } from '../components/CourseManager';

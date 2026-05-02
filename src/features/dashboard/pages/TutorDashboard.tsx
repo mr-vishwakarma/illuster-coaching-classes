@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, BookOpen, AlertCircle, Video, PlayCircle, HelpCircle, ArrowLeft } from 'lucide-react';
+import { Users, BookOpen, AlertCircle, Video, PlayCircle, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
