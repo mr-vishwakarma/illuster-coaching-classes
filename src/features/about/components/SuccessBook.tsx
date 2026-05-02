@@ -3,22 +3,71 @@ import HTMLFlipBook from 'react-pageflip';
 import useSound from 'use-sound';
 import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
 
-/* ── palette ─────────────────────────────────────────────── */
-const LAVENDER   = '#DDD6F3';
-const CREAM      = '#FAF7F2';
-const WARM_GRAY  = '#E8E2D9';
+/* ─────────────────────── palette ─────────────────────────── */
+const PAGE_BG    = '#e2dff3';   // unified book page colour (user's request)
+const ACCENT     = '#9B8EC4';   // deep lavender accent
+const DARK_TXT   = '#2D2B3D';
+const SLATE_TXT  = '#4A4458';
 const DUSTY_ROSE = '#E8C9C0';
 const SAGE       = '#C8D8C0';
-const SLATE_TXT  = '#4A4458';
-const DARK_TXT   = '#2D2B3D';
-const ACCENT     = '#9B8EC4';   // deeper lavender accent
+const BORDER_CLR = '#D4956A';   // salmon/peach border  (from reference image)
 
-/* ── page wrapper ────────────────────────────────────────── */
+/* ─────────────────────── Spiral Binding ─────────────────────
+   Absolutely-positioned SVG rendered OVER the book spread.
+   Each ring is a rounded rectangle (like the metal coil photo).   */
+const SpiralBinding = () => {
+  const ringCount = 18;
+  const ringH     = 18;
+  const gap       = 6;
+  const totalH    = ringCount * (ringH + gap);
+
+  return (
+    <div
+      className="absolute inset-y-0 left-1/2 -translate-x-1/2 flex items-center justify-center z-30 pointer-events-none"
+      style={{ width: 28 }}
+    >
+      <svg
+        width={28}
+        height={totalH}
+        viewBox={`0 0 28 ${totalH}`}
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {Array.from({ length: ringCount }).map((_, i) => {
+          const y = i * (ringH + gap);
+          return (
+            <g key={i}>
+              {/* back half of ring (shadow) */}
+              <rect x={2} y={y + 2} width={24} height={ringH - 4} rx={5}
+                    fill="#b0a8c8" opacity={0.5} />
+              {/* ring body */}
+              <rect x={0} y={y} width={28} height={ringH} rx={6}
+                    fill="url(#ringGrad)" stroke="#c8c0e0" strokeWidth={0.8} />
+              {/* inner window to create coil effect */}
+              <rect x={6} y={y + 4} width={16} height={ringH - 8} rx={3}
+                    fill="#e2dff3" opacity={0.7} />
+            </g>
+          );
+        })}
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stopColor="#d8d0f0" />
+            <stop offset="40%"  stopColor="#f0eeff" />
+            <stop offset="70%"  stopColor="#c8bfe8" />
+            <stop offset="100%" stopColor="#b8b0d8" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  );
+};
+
+/* ─────────────────────── Page wrapper ───────────────────────  */
 const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; bg?: string }>(
-  ({ children, bg = CREAM }, ref) => (
+  ({ children, bg = PAGE_BG }, ref) => (
     <div
       ref={ref}
-      style={{ background: bg, boxShadow: 'inset -4px 0 12px rgba(0,0,0,0.06)' }}
+      style={{ background: bg, boxShadow: 'inset -3px 0 10px rgba(0,0,0,0.04)' }}
       className="w-full h-full overflow-hidden select-none"
     >
       {children}
@@ -27,78 +76,78 @@ const Page = forwardRef<HTMLDivElement, { children: React.ReactNode; bg?: string
 );
 Page.displayName = 'Page';
 
-/* ── COVER ───────────────────────────────────────────────── */
+/* ─────────────────────── Cover ──────────────────────────────  */
 const CoverPage = forwardRef<HTMLDivElement>((_, ref) => (
-  <Page ref={ref} bg={LAVENDER}>
+  <Page ref={ref} bg="#cfc9ed">
     <div className="w-full h-full flex flex-col items-center justify-center p-8 relative">
       <div style={{ color: ACCENT }} className="mb-4 opacity-60">
-        <BookOpen size={48} strokeWidth={1.2} />
+        <BookOpen size={44} strokeWidth={1.2} />
       </div>
-      <p style={{ color: ACCENT, letterSpacing: '0.4em', fontSize: 10 }}
-         className="font-bold uppercase mb-4">
+      <p style={{ color: ACCENT, letterSpacing: '0.4em', fontSize: 9 }}
+         className="font-bold uppercase mb-3">
         ILLUSTER COACHING CLASSES
       </p>
-      <h1 style={{ color: DARK_TXT, lineHeight: 1.1 }}
-          className="text-5xl font-black text-center mb-4 tracking-tighter">
+      <h1 style={{ color: DARK_TXT, lineHeight: 1.05 }}
+          className="text-4xl font-black text-center mb-4 tracking-tighter">
         THE&nbsp;SUCCESS<br/>DIARY
       </h1>
-      <div style={{ background: ACCENT }} className="h-0.5 w-16 mb-4 rounded-full" />
-      <p style={{ color: SLATE_TXT }} className="text-sm font-medium tracking-widest uppercase">
+      <div style={{ background: BORDER_CLR }} className="h-0.5 w-14 mb-4 rounded-full opacity-70" />
+      <p style={{ color: SLATE_TXT }} className="text-[11px] font-medium tracking-widest uppercase">
         Annual Edition 2024
       </p>
-      {/* corner decorations */}
-      <div style={{ background: DUSTY_ROSE, opacity: 0.5 }}
-           className="absolute top-6 right-6 w-16 h-16 rounded-full blur-xl" />
-      <div style={{ background: SAGE, opacity: 0.5 }}
-           className="absolute bottom-10 left-8 w-12 h-12 rounded-full blur-xl" />
+      <div style={{ background: DUSTY_ROSE, opacity: 0.4 }}
+           className="absolute top-5 right-5 w-14 h-14 rounded-full blur-xl" />
+      <div style={{ background: SAGE, opacity: 0.4 }}
+           className="absolute bottom-8 left-6 w-10 h-10 rounded-full blur-xl" />
     </div>
   </Page>
 ));
 CoverPage.displayName = 'CoverPage';
 
-/* ── INDEX ───────────────────────────────────────────────── */
+/* ─────────────────────── Index ──────────────────────────────  */
 interface ChapterEntry { num: number; title: string; subtitle: string; page: number }
 const chapters: ChapterEntry[] = [
-  { num: 1, title: 'Our Milestones',   subtitle: 'A decade of excellence',          page: 2 },
-  { num: 2, title: 'Hall of Toppers',  subtitle: 'Students who conquered',          page: 6 },
-  { num: 3, title: 'What We Provide',  subtitle: 'Resources & ecosystem',           page: 10 },
+  { num: 1, title: 'Our Milestones',  subtitle: 'A decade of excellence',   page: 2 },
+  { num: 2, title: 'Hall of Toppers', subtitle: 'Students who conquered',   page: 6 },
+  { num: 3, title: 'What We Provide', subtitle: 'Resources & ecosystem',    page: 10 },
 ];
 
 const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
   ({ onJump }, ref) => (
-    <Page ref={ref} bg={CREAM}>
-      <div className="p-10 h-full flex flex-col">
-        <div className="flex items-center gap-3 mb-8">
-          <List size={20} style={{ color: ACCENT }} />
-          <h2 style={{ color: DARK_TXT }} className="text-2xl font-black tracking-tight">
+    <Page ref={ref} bg={PAGE_BG}>
+      <div className="p-8 h-full flex flex-col">
+        <div className="flex items-center gap-2 mb-6">
+          <List size={18} style={{ color: ACCENT }} />
+          <h2 style={{ color: DARK_TXT }} className="text-xl font-black tracking-tight">
             Table of Contents
           </h2>
         </div>
-        <div className="flex flex-col gap-4 flex-1">
+        <div className="flex flex-col gap-3 flex-1">
           {chapters.map(ch => (
             <button
               key={ch.num}
               onClick={() => onJump(ch.page)}
-              style={{ background: LAVENDER, borderLeft: `4px solid ${ACCENT}` }}
-              className="w-full text-left px-5 py-4 rounded-xl hover:brightness-95 transition-all group"
+              style={{ background: '#d6d1ee', borderLeft: `4px solid ${ACCENT}` }}
+              className="w-full text-left px-4 py-3 rounded-xl hover:brightness-95 transition-all group"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p style={{ color: ACCENT, fontSize: 10 }}
-                     className="font-black uppercase tracking-widest mb-1">
+                  <p style={{ color: ACCENT, fontSize: 9 }}
+                     className="font-black uppercase tracking-widest mb-0.5">
                     Chapter {ch.num}
                   </p>
-                  <h3 style={{ color: DARK_TXT }} className="text-lg font-black">{ch.title}</h3>
-                  <p style={{ color: SLATE_TXT }} className="text-xs font-medium mt-0.5">{ch.subtitle}</p>
+                  <h3 style={{ color: DARK_TXT }} className="text-base font-black">{ch.title}</h3>
+                  <p style={{ color: SLATE_TXT }} className="text-[10px] font-medium">{ch.subtitle}</p>
                 </div>
-                <span style={{ color: ACCENT }} className="text-3xl font-black opacity-30 group-hover:opacity-60 transition-opacity">
+                <span style={{ color: ACCENT }}
+                      className="text-2xl font-black opacity-25 group-hover:opacity-50 transition-opacity">
                   {String(ch.page).padStart(2, '0')}
                 </span>
               </div>
             </button>
           ))}
         </div>
-        <p style={{ color: WARM_GRAY, fontSize: 9 }} className="text-center tracking-widest uppercase mt-6">
+        <p style={{ color: '#a09ac0', fontSize: 9 }} className="text-center tracking-widest uppercase mt-4">
           Flip pages to explore →
         </p>
       </div>
@@ -107,7 +156,7 @@ const IndexPage = forwardRef<HTMLDivElement, { onJump: (p: number) => void }>(
 );
 IndexPage.displayName = 'IndexPage';
 
-/* ── content data ────────────────────────────────────────── */
+/* ─────────────────────── Content data ───────────────────────  */
 interface PageData {
   side: 'left' | 'right';
   chapter: string;
@@ -116,140 +165,95 @@ interface PageData {
   tag?: string;
   imageUrl: string;
   imageLabel: string;
-  bg: string;
   accent: string;
 }
 
 const pages: PageData[] = [
-  /* Chapter 1 spread 1 */
-  {
-    side: 'left', chapter: 'Chapter 01', title: 'Est. 2012',
-    body: 'Illuster was founded with a simple promise: every student deserves world-class guidance. Today, over 15,000 students have walked through our doors and emerged as toppers.',
-    imageUrl: 'https://images.unsplash.com/photo-1523050337456-6814427b3d46?w=500&q=80',
-    imageLabel: 'Founding Day', bg: LAVENDER, accent: ACCENT, tag: 'Our Beginning'
-  },
-  {
-    side: 'right', chapter: 'Chapter 01', title: '100+ Centres',
-    body: 'From a single classroom, Illuster now operates across 100+ study centres in 8 cities, bringing elite JEE and NEET coaching closer to every aspiring student.',
-    imageUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80',
-    imageLabel: 'Expansion', bg: CREAM, accent: ACCENT, tag: 'Growth'
-  },
-  /* Chapter 1 spread 2 */
-  {
-    side: 'left', chapter: 'Chapter 01', title: 'Best Institute Award',
-    body: 'Recognized 12 times by leading education bodies for outstanding academic results and student satisfaction scores above 97%.',
-    imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb28f74b671?w=500&q=80',
-    imageLabel: 'Award Ceremony', bg: WARM_GRAY, accent: ACCENT, tag: 'Recognition'
-  },
-  {
-    side: 'right', chapter: 'Chapter 01', title: 'Modern Classrooms',
-    body: 'Cutting-edge infrastructure with air-conditioned rooms, smart boards, high-speed labs, and live-session recording for every batch.',
-    imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&q=80',
-    imageLabel: 'Infrastructure', bg: CREAM, accent: ACCENT, tag: 'Facilities'
-  },
-  /* Chapter 2 spread 1 */
-  {
-    side: 'left', chapter: 'Chapter 02', title: 'IIT-JEE AIR 42',
-    body: 'Aryan Mehta cracked IIT-JEE with an All India Rank of 42 after 2 years at Illuster. His secret? Consistent doubt sessions and our legendary test series.',
-    imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&q=80',
-    imageLabel: 'Aryan Mehta – AIR 42', bg: DUSTY_ROSE, accent: '#A0584A', tag: 'Hall of Fame'
-  },
-  {
-    side: 'right', chapter: 'Chapter 02', title: 'NEET 710 / 720',
-    body: 'Priya Sharma scored 710 in NEET, securing admission to AIIMS Delhi. Her journey at Illuster is a testament to discipline and structured learning.',
-    imageUrl: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=500&q=80',
-    imageLabel: 'Priya Sharma – NEET 710', bg: CREAM, accent: ACCENT, tag: 'Medical Topper'
-  },
-  /* Chapter 2 spread 2 */
-  {
-    side: 'left', chapter: 'Chapter 02', title: 'NTSE Scholars',
-    body: 'Over 340 students cleared NTSE from Illuster batches in 2024 alone, placing us among the top 5 institutes nationally for NTSE coaching.',
-    imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&q=80',
-    imageLabel: 'NTSE Batch 2024', bg: SAGE, accent: '#4A7C59', tag: 'Scholarship'
-  },
-  {
-    side: 'right', chapter: 'Chapter 02', title: 'Olympiad Gold',
-    body: 'International Science Olympiad gold medalists trained exclusively at Illuster, showcasing our reach beyond national competitive exams.',
-    imageUrl: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=500&q=80',
-    imageLabel: 'Olympiad Winners', bg: CREAM, accent: ACCENT, tag: 'Global'
-  },
-  /* Chapter 3 spread 1 */
-  {
-    side: 'left', chapter: 'Chapter 03', title: 'Hi-Tech Labs',
-    body: 'State-of-the-art physics, chemistry and biology labs designed for hands-on learning, reinforcing concepts that textbooks alone cannot teach.',
-    imageUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500&q=80',
-    imageLabel: 'Science Lab', bg: LAVENDER, accent: ACCENT, tag: 'Infrastructure'
-  },
-  {
-    side: 'right', chapter: 'Chapter 03', title: '24 / 7 Library',
-    body: 'A curated library with 10,000+ books, e-resources, and silent study pods available around the clock for every enrolled student.',
-    imageUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=500&q=80',
-    imageLabel: 'Library', bg: CREAM, accent: ACCENT, tag: 'Resources'
-  },
-  /* Chapter 3 spread 2 */
-  {
-    side: 'left', chapter: 'Chapter 03', title: 'Live Portal',
-    body: 'Our proprietary EdTech platform enables live classes, recorded lectures, AI-powered doubt resolution, and personalised progress analytics.',
-    imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80',
-    imageLabel: 'Student Portal', bg: WARM_GRAY, accent: ACCENT, tag: 'Technology'
-  },
-  {
-    side: 'right', chapter: 'Chapter 03', title: 'Testing App',
-    body: 'Weekly adaptive mock tests, chapter-wise DPPs, and all-India ranking simulations prepare our students for exam-day performance like no other.',
-    imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80',
-    imageLabel: 'Assessment Suite', bg: CREAM, accent: ACCENT, tag: 'Practice'
-  },
+  { side:'left',  chapter:'Chapter 01', title:'Est. 2012',
+    body:'Illuster was founded with a simple promise: every student deserves world-class guidance. Today, over 15,000 students have walked through our doors and emerged as toppers.',
+    imageUrl:'https://images.unsplash.com/photo-1523050337456-6814427b3d46?w=500&q=80',
+    imageLabel:'Founding Day', accent:ACCENT, tag:'Our Beginning' },
+  { side:'right', chapter:'Chapter 01', title:'100+ Centres',
+    body:'From a single classroom, Illuster now operates across 100+ study centres in 8 cities, bringing elite JEE and NEET coaching closer to every aspiring student.',
+    imageUrl:'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80',
+    imageLabel:'Expansion', accent:ACCENT, tag:'Growth' },
+  { side:'left',  chapter:'Chapter 01', title:'Best Institute Award',
+    body:'Recognized 12 times by leading education bodies for outstanding academic results and student satisfaction scores above 97%.',
+    imageUrl:'https://images.unsplash.com/photo-1524178232363-1fb28f74b671?w=500&q=80',
+    imageLabel:'Award Ceremony', accent:ACCENT, tag:'Recognition' },
+  { side:'right', chapter:'Chapter 01', title:'Modern Classrooms',
+    body:'Cutting-edge infrastructure with air-conditioned rooms, smart boards, high-speed labs, and live-session recording for every batch.',
+    imageUrl:'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&q=80',
+    imageLabel:'Infrastructure', accent:ACCENT, tag:'Facilities' },
+  { side:'left',  chapter:'Chapter 02', title:'IIT-JEE AIR 42',
+    body:'Aryan Mehta cracked IIT-JEE with an All India Rank of 42 after 2 years at Illuster. His secret? Consistent doubt sessions and our legendary test series.',
+    imageUrl:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&q=80',
+    imageLabel:'Aryan Mehta – AIR 42', accent:'#A0584A', tag:'Hall of Fame' },
+  { side:'right', chapter:'Chapter 02', title:'NEET 710 / 720',
+    body:'Priya Sharma scored 710 in NEET, securing admission to AIIMS Delhi. Her journey at Illuster is a testament to discipline and structured learning.',
+    imageUrl:'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=500&q=80',
+    imageLabel:'Priya Sharma – NEET 710', accent:ACCENT, tag:'Medical Topper' },
+  { side:'left',  chapter:'Chapter 02', title:'NTSE Scholars',
+    body:'Over 340 students cleared NTSE from Illuster batches in 2024 alone, placing us among the top 5 institutes nationally for NTSE coaching.',
+    imageUrl:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&q=80',
+    imageLabel:'NTSE Batch 2024', accent:'#4A7C59', tag:'Scholarship' },
+  { side:'right', chapter:'Chapter 02', title:'Olympiad Gold',
+    body:'International Science Olympiad gold medalists trained exclusively at Illuster, showcasing our reach beyond national competitive exams.',
+    imageUrl:'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=500&q=80',
+    imageLabel:'Olympiad Winners', accent:ACCENT, tag:'Global' },
+  { side:'left',  chapter:'Chapter 03', title:'Hi-Tech Labs',
+    body:'State-of-the-art physics, chemistry and biology labs designed for hands-on learning, reinforcing concepts that textbooks alone cannot teach.',
+    imageUrl:'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500&q=80',
+    imageLabel:'Science Lab', accent:ACCENT, tag:'Infrastructure' },
+  { side:'right', chapter:'Chapter 03', title:'24/7 Library',
+    body:'A curated library with 10,000+ books, e-resources, and silent study pods available around the clock for every enrolled student.',
+    imageUrl:'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=500&q=80',
+    imageLabel:'Library', accent:ACCENT, tag:'Resources' },
+  { side:'left',  chapter:'Chapter 03', title:'Live Portal',
+    body:'Our proprietary EdTech platform enables live classes, recorded lectures, AI-powered doubt resolution, and personalised progress analytics.',
+    imageUrl:'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80',
+    imageLabel:'Student Portal', accent:ACCENT, tag:'Technology' },
+  { side:'right', chapter:'Chapter 03', title:'Testing App',
+    body:'Weekly adaptive mock tests, chapter-wise DPPs, and all-India ranking simulations prepare our students for exam-day performance like no other.',
+    imageUrl:'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80',
+    imageLabel:'Assessment Suite', accent:ACCENT, tag:'Practice' },
 ];
 
-/* ── content page ────────────────────────────────────────── */
+/* ─────────────────────── Content Page ───────────────────────  */
 const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number }>(
   ({ data, pageNum }, ref) => (
-    <Page ref={ref} bg={data.bg}>
-      <div className="w-full h-full flex flex-col p-8 gap-4">
-        {/* chapter + tag row */}
+    <Page ref={ref} bg={PAGE_BG}>
+      <div className="w-full h-full flex flex-col p-7 gap-3">
         <div className="flex items-center justify-between">
-          <p style={{ color: data.accent, fontSize: 9 }} className="font-black uppercase tracking-[0.35em]">
+          <p style={{ color: data.accent, fontSize: 8 }} className="font-black uppercase tracking-[0.35em]">
             {data.chapter}
           </p>
           {data.tag && (
-            <span style={{ background: data.accent + '20', color: data.accent, fontSize: 9 }}
+            <span style={{ background: data.accent + '22', color: data.accent, fontSize: 8 }}
                   className="px-2 py-0.5 rounded-full font-black uppercase tracking-widest">
               {data.tag}
             </span>
           )}
         </div>
 
-        {/* image */}
-        <div className="relative w-full rounded-xl overflow-hidden flex-1 max-h-[45%]">
-          <img
-            src={data.imageUrl}
-            alt={data.imageLabel}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-          <p style={{ fontSize: 9 }}
+        <div className="relative w-full rounded-xl overflow-hidden flex-1 max-h-[44%]">
+          <img src={data.imageUrl} alt={data.imageLabel} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+          <p style={{ fontSize: 8 }}
              className="absolute bottom-2 left-3 text-white/80 font-black uppercase tracking-widest">
             {data.imageLabel}
           </p>
         </div>
 
-        {/* divider */}
-        <div style={{ background: data.accent }} className="h-px w-10 rounded-full opacity-40" />
-
-        {/* title */}
-        <h2 style={{ color: DARK_TXT, lineHeight: 1.1 }}
-            className="text-2xl font-black tracking-tight">
+        <div style={{ background: data.accent }} className="h-px w-8 rounded-full opacity-40" />
+        <h2 style={{ color: DARK_TXT, lineHeight: 1.1 }} className="text-xl font-black tracking-tight">
           {data.title}
         </h2>
-
-        {/* body */}
-        <p style={{ color: SLATE_TXT }} className="text-xs leading-relaxed flex-1">
+        <p style={{ color: SLATE_TXT }} className="text-[11px] leading-relaxed flex-1">
           {data.body}
         </p>
-
-        {/* page number */}
-        <p style={{ color: data.accent, fontSize: 9 }}
-           className="font-black uppercase tracking-widest text-right opacity-50">
+        <p style={{ color: data.accent, fontSize: 8 }}
+           className="font-black uppercase tracking-widest text-right opacity-40">
           {String(pageNum).padStart(2, '0')}
         </p>
       </div>
@@ -258,19 +262,18 @@ const ContentPage = forwardRef<HTMLDivElement, { data: PageData; pageNum: number
 );
 ContentPage.displayName = 'ContentPage';
 
-/* ── back cover ──────────────────────────────────────────── */
+/* ─────────────────────── Back Cover ─────────────────────────  */
 const BackCover = forwardRef<HTMLDivElement>((_, ref) => (
-  <Page ref={ref} bg={DARK_TXT}>
+  <Page ref={ref} bg="#2D2B3D">
     <div className="w-full h-full flex flex-col items-center justify-center p-8">
-      <div style={{ color: LAVENDER, opacity: 0.2 }} className="mb-6">
-        <BookOpen size={64} strokeWidth={1} />
+      <div style={{ color: PAGE_BG, opacity: 0.2 }} className="mb-5">
+        <BookOpen size={56} strokeWidth={1} />
       </div>
-      <h2 style={{ color: LAVENDER }} className="text-3xl font-black text-center mb-3 tracking-tighter">
+      <h2 style={{ color: PAGE_BG }} className="text-2xl font-black text-center mb-3 tracking-tighter">
         Your Journey<br />Starts Here.
       </h2>
-      <div style={{ background: ACCENT }} className="h-0.5 w-12 mb-4 rounded-full opacity-60" />
-      <p style={{ color: LAVENDER, opacity: 0.5 }}
-         className="text-xs text-center tracking-widest uppercase">
+      <div style={{ background: BORDER_CLR }} className="h-0.5 w-10 mb-4 rounded-full opacity-60" />
+      <p style={{ color: PAGE_BG, opacity: 0.4 }} className="text-[10px] text-center tracking-widest uppercase">
         illuster.in
       </p>
     </div>
@@ -278,14 +281,18 @@ const BackCover = forwardRef<HTMLDivElement>((_, ref) => (
 ));
 BackCover.displayName = 'BackCover';
 
-/* ── MAIN COMPONENT ──────────────────────────────────────── */
+/* ─────────────────────── MAIN ───────────────────────────────  */
 const SuccessBook = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bookRef = useRef<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const totalPages = 2 + 2 + pages.length + 1; // cover + index + content + back
+  const totalPages = 2 + pages.length + 1; // cover + index + content + back
 
-  const [playFlip] = useSound('/sounds/page-flip.wav', { volume: 0.6 });
+  /**
+   * 🔊 Sound path: /public/sounds/page-flip.mp3
+   * Drop your MP3 file at:  public/sounds/page-flip.mp3
+   */
+  const [playFlip] = useSound('/sounds/page-flip.mp3', { volume: 0.65 });
 
   const flip = (dir: 'next' | 'prev') => {
     playFlip();
@@ -301,97 +308,110 @@ const SuccessBook = () => {
   const onFlip = (e: { data: number }) => setCurrentPage(e.data);
 
   return (
-    <div className="py-20 overflow-hidden" style={{ background: '#1C1A2E' }}>
+    /* outer section – background: #e5e5e5 */
+    <div className="py-20 overflow-hidden" style={{ background: '#e5e5e5' }}>
+
       {/* header */}
       <div className="container mx-auto px-6 text-center mb-14">
         <p style={{ color: ACCENT, letterSpacing: '0.4em', fontSize: 11 }}
            className="font-black uppercase mb-3">Our Story in Pages</p>
-        <h2 className="text-4xl md:text-6xl font-black text-white mb-3 tracking-tighter">
+        <h2 style={{ color: DARK_TXT }} className="text-4xl md:text-6xl font-black mb-3 tracking-tighter">
           The <span style={{ color: ACCENT }}>Illuster</span> Diary
         </h2>
-        <p style={{ color: '#8884a0' }} className="max-w-md mx-auto text-sm font-medium">
+        <p style={{ color: '#7a7890' }} className="max-w-md mx-auto text-sm font-medium">
           Flip through our chapters of milestones, toppers, and everything we offer.
         </p>
       </div>
 
-      {/* book + arrows */}
+      {/* book row */}
       <div className="flex items-center justify-center gap-4 md:gap-8 px-4">
+
+        {/* prev button */}
         <button
           onClick={() => flip('prev')}
           disabled={currentPage === 0}
-          style={{ background: LAVENDER + '20', border: `1px solid ${LAVENDER}30` }}
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white disabled:opacity-20 hover:bg-white/10 transition-all shrink-0"
+          style={{ background: '#c8c0e820', border: '1px solid #c8c0e840', color: DARK_TXT }}
+          className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-20 hover:bg-black/5 transition-all shrink-0"
         >
           <ChevronLeft size={22} />
         </button>
 
-        {/* flipbook */}
+        {/* ── salmon-border frame ── */}
         <div
-          className="rounded-2xl overflow-hidden"
           style={{
-            boxShadow: `0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px ${ACCENT}20`,
+            border: `8px solid ${BORDER_CLR}`,
+            borderRadius: '18px',
+            padding: '10px',
+            background: '#d4956a',
+            boxShadow: '0 30px 70px -15px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.12)',
+            position: 'relative',
           }}
         >
-          {/* @ts-expect-error react-pageflip types */}
-          <HTMLFlipBook
-            ref={bookRef}
-            width={320}
-            height={440}
-            size="fixed"
-            minWidth={220}
-            maxWidth={480}
-            minHeight={300}
-            maxHeight={600}
-            showCover
-            mobileScrollSupport
-            onFlip={onFlip}
-            drawShadow
-            flippingTime={700}
-            startPage={0}
-            usePortrait={false}
-            startZIndex={10}
-            autoSize={false}
-            clickEventForward
-            useMouseEvents
-            swipeDistance={30}
-            showPageCorners
-            disableFlipByClick={false}
-            className=""
-          >
-            {/* 0 – cover */}
-            <CoverPage />
+          {/* inner white mat around the book */}
+          <div style={{ borderRadius: '10px', overflow: 'hidden', position: 'relative' }}>
 
-            {/* 1 – index */}
-            <IndexPage onJump={jumpTo} />
+            {/* spiral binding overlay */}
+            <SpiralBinding />
 
-            {/* 2…N-2 – content */}
-            {pages.map((p, i) => (
-              <ContentPage key={i} data={p} pageNum={i + 2} />
-            ))}
-
-            {/* last – back cover */}
-            <BackCover />
-          </HTMLFlipBook>
+            {/* @ts-expect-error react-pageflip types */}
+            <HTMLFlipBook
+              ref={bookRef}
+              width={310}
+              height={430}
+              size="fixed"
+              minWidth={220}
+              maxWidth={460}
+              minHeight={300}
+              maxHeight={580}
+              showCover
+              mobileScrollSupport
+              onFlip={onFlip}
+              drawShadow
+              flippingTime={750}
+              startPage={0}
+              usePortrait={false}
+              startZIndex={10}
+              autoSize={false}
+              clickEventForward
+              useMouseEvents
+              swipeDistance={30}
+              showPageCorners
+              disableFlipByClick={false}
+              className=""
+            >
+              <CoverPage />
+              <IndexPage onJump={jumpTo} />
+              {pages.map((p, i) => (
+                <ContentPage key={i} data={p} pageNum={i + 2} />
+              ))}
+              <BackCover />
+            </HTMLFlipBook>
+          </div>
         </div>
 
+        {/* next button */}
         <button
           onClick={() => flip('next')}
           disabled={currentPage >= totalPages - 1}
-          style={{ background: LAVENDER + '20', border: `1px solid ${LAVENDER}30` }}
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white disabled:opacity-20 hover:bg-white/10 transition-all shrink-0"
+          style={{ background: '#c8c0e820', border: '1px solid #c8c0e840', color: DARK_TXT }}
+          className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-20 hover:bg-black/5 transition-all shrink-0"
         >
           <ChevronRight size={22} />
         </button>
       </div>
 
-      {/* chapter index pills */}
+      {/* chapter jump pills */}
       <div className="flex items-center justify-center gap-3 mt-10 flex-wrap px-4">
         {chapters.map(ch => (
           <button
             key={ch.num}
             onClick={() => jumpTo(ch.page)}
-            style={{ background: ACCENT + '18', border: `1px solid ${ACCENT}30`, color: LAVENDER }}
-            className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+            style={{
+              background: ACCENT + '18',
+              border: `1px solid ${ACCENT}40`,
+              color: DARK_TXT,
+            }}
+            className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black/5 transition-all"
           >
             Ch.{ch.num} — {ch.title}
           </button>
@@ -399,9 +419,16 @@ const SuccessBook = () => {
       </div>
 
       {/* page counter */}
-      <p style={{ color: '#8884a0' }} className="text-center mt-4 text-xs font-medium">
+      <p style={{ color: '#7a7890' }} className="text-center mt-4 text-[11px] font-medium">
         Page {currentPage + 1} / {totalPages}
       </p>
+
+      {/* 📢 sound file note (visible only in dev, hidden in prod) */}
+      {import.meta.env.DEV && (
+        <p className="text-center mt-3 text-[10px] text-gray-400">
+          🔊 Drop your audio file at: <code className="bg-gray-200 px-1 rounded">public/sounds/page-flip.mp3</code>
+        </p>
+      )}
     </div>
   );
 };
