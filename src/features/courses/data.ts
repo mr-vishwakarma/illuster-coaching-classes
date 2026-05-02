@@ -1,6 +1,5 @@
 import type { Course, Faculty, StudyMaterial } from './types';
 
-// ─── COURSES ──────────────────────────────────────────────────────────────────
 export const courses: Course[] = [
   {
     id: "course-jee-physics",

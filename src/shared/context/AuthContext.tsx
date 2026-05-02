@@ -1,39 +1,94 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
-import { mockUsers, type User, type UserRole } from "../../features/auth";
+import { supabase } from "../lib/supabase";
+import type { User, UserRole } from "../../features/auth/types";
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   role: UserRole | null;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = sessionStorage.getItem("illuster_user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = useCallback(async (email: string, password: string) => {
-    await new Promise((r) => setTimeout(r, 800)); // simulate async
-    const found = mockUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-    if (found) {
-      setUser(found);
-      sessionStorage.setItem("illuster_user", JSON.stringify(found));
-      return { success: true };
-    }
-    return { success: false, error: "Invalid email or password." };
+  // Sync session from Supabase
+  useEffect(() => {
+    // 1. Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        fetchProfile(session.user.id, session.user.email!);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    // 2. Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        fetchProfile(session.user.id, session.user.email!);
+      } else {
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const logout = useCallback(() => {
+  const fetchProfile = async (id: string, email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        setUser({
+          id,
+          email,
+          name: data.full_name || email.split('@')[0],
+          role: data.role as UserRole,
+          avatar: data.avatar_url || '👤',
+          password: '', // Not stored in client
+          enrolledCourses: [], // Fetch these separately later
+          joinDate: new Date().toLocaleDateString(),
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = useCallback(async (email: string, password: string) => {
+    setIsLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      setIsLoading(false);
+      return { success: false, error: error.message };
+    }
+    
+    // fetchProfile will be called by onAuthStateChange trigger
+    return { success: true };
+  }, []);
+
+  const logout = useCallback(async () => {
+    setIsLoading(true);
+    await supabase.auth.signOut();
     setUser(null);
-    sessionStorage.removeItem("illuster_user");
+    setIsLoading(false);
   }, []);
 
   return (
@@ -42,6 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         isAuthenticated: !!user,
         role: user?.role ?? null,
+        isLoading,
         login,
         logout,
       }}

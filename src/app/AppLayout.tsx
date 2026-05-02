@@ -3,10 +3,13 @@ import Navbar from '../shared/components/Navbar';
 import Footer from '../shared/components/Footer';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
 import AppRoutes from './routes';
+import { useAuth } from '../shared/context/AuthContext';
 
 // ─── Layout wrapper with conditional Navbar/Footer ───────────────────────────
 const AppLayout = () => {
   const { pathname } = useLocation();
+  const { isAuthenticated } = useAuth();
+  
   const isLiveClass = pathname === '/live-class';
   const isLogin = pathname === '/login';
   const isRequestCallback = pathname === '/request-callback';
@@ -16,7 +19,7 @@ const AppLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#050505]">
-      {!isLiveClass && <Navbar />}
+      {(!isLiveClass && !isAuthenticated) && <Navbar />}
       <main className="flex-grow">
         <ErrorBoundary>
           <AppRoutes />

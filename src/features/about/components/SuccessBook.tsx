@@ -3,13 +3,11 @@ import HTMLFlipBook from 'react-pageflip';
 import useSound from 'use-sound';
 import { ChevronLeft, ChevronRight, BookOpen, List } from 'lucide-react';
 
-/* ─────────────────────── palette ─────────────────────────── */
 const PAGE_BG    = '#8a76ffff';   
 const ACCENT     = '#3500e4ff';   
 const DARK_TXT   = '#2D2B3D';
 const BORDER_CLR = '#ff802bff';   
 
-/* ─────────────────────── Spiral Binding ───────────────────── */
 const SpiralBinding = ({ isMobile }: { isMobile: boolean }) => {
   const ringCount = 18;
   const ringH     = 18;
