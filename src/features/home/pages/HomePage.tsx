@@ -2,7 +2,8 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Phone, Mail, MapPin, Send } from 'lucide-react';
-import { courses } from '../../courses';
+import { courses as mockCourses } from '../../courses';
+import { supabase } from '../../../shared/lib/supabase';
 import { stats } from '../';
 import Skeleton from '../../../shared/components/Skeleton';
 import SienaParallax from '../components/SienaParallax';
@@ -14,15 +15,28 @@ import AnimatedLogoBackground from '../../about/components/AnimatedLogoBackgroun
 
 const Home = () => {
   const [isLoading, setIsLoading] = React.useState(true);
+  const [liveCourses, setLiveCourses] = React.useState<any[]>([]);
 
   useEffect(() => {
-    // Simulate initial data loading
+    fetchLiveCourses();
     const timer = setTimeout(() => setIsLoading(false), 2000);
-
     return () => clearTimeout(timer);
   }, []);
 
-  const topCourses = courses.slice(0, 3);
+  const fetchLiveCourses = async () => {
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('is_published', true)
+      .limit(6);
+    
+    if (data && data.length > 0) {
+      setLiveCourses(data);
+    }
+  };
+
+  const displayCourses = liveCourses.length > 0 ? liveCourses : mockCourses;
+  const topCourses = displayCourses.slice(0, 3);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -284,7 +298,7 @@ const Home = () => {
                   <label className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-widest ml-1">Select Course</label>
                   <select className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-orange-500 transition-all font-bold appearance-none">
                     <option className="bg-black">Select a course</option>
-                    {courses.map(c => <option key={c.id} className="bg-black">{c.title}</option>)}
+                    {displayCourses.map(c => <option key={c.id} className="bg-black">{c.title}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5 md:space-y-2">

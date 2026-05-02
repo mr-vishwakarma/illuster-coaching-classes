@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Play, CheckCircle2, User, Cloud, Sparkles } from 'lucide-react';
-import { courses } from '../';
+import { courses as mockCourses } from '../';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { supabase } from '../../../shared/lib/supabase';
@@ -12,34 +12,59 @@ const CourseDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const course = courses.find(c => c.id === id) || courses[0];
-
+  
+  const [course, setCourse] = useState<any>(null);
   const [enrollStatus, setEnrollStatus] = useState<'none' | 'pending' | 'active'>('none');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user && id) {
-      checkEnrollmentStatus();
-    }
-  }, [user, id]);
+    loadCourseData();
+  }, [id, user]);
 
-  const checkEnrollmentStatus = async () => {
-    const { data } = await supabase
-      .from('course_enrollments')
-      .select('status')
-      .eq('student_id', user?.id)
-      .eq('course_id', id)
-      .maybeSingle();
+  const loadCourseData = async () => {
+    setIsLoading(true);
+    
+    // 1. Try to find in mock data first for instant UI
+    const mockMatch = mockCourses.find(c => c.id === id);
+    if (mockMatch) setCourse(mockMatch);
 
-    if (data) {
-      setEnrollStatus(data.status as any);
+    // 2. Try to fetch from Supabase if id looks like a UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (id && uuidRegex.test(id)) {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (data) setCourse(data);
     }
+
+    // 3. Check enrollment status if logged in
+    if (user && id && uuidRegex.test(id)) {
+      const { data } = await supabase
+        .from('course_enrollments')
+        .select('status')
+        .eq('student_id', user?.id)
+        .eq('course_id', id)
+        .maybeSingle();
+
+      if (data) setEnrollStatus(data.status as any);
+    }
+
+    setIsLoading(false);
   };
 
   const handleEnroll = async () => {
     if (!user) {
       toast.info("Please login to enroll");
       navigate('/login');
+      return;
+    }
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!id || !uuidRegex.test(id)) {
+      toast.warning("Enrollment is only available for live courses.");
       return;
     }
 
@@ -53,13 +78,16 @@ const CourseDetail = () => {
       ]);
 
     if (error) {
-      toast.error("Failed to submit request");
+      toast.error("Failed to submit request. Please ensure the course is active.");
     } else {
       toast.success("Enrollment request sent to Admin!");
       setEnrollStatus('pending');
     }
     setIsLoading(false);
   };
+
+  if (isLoading && !course) return <div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-spin h-10 w-10 border-b-2 border-primary rounded-full"></div></div>;
+  if (!course) return <div className="min-h-screen bg-black flex items-center justify-center text-white">Course not found.</div>;
   
   return (
     <div className="pt-32 md:pt-40 min-h-screen bg-[#050805] text-white selection:bg-green-500/30">
