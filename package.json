@@ -21,6 +21,7 @@
     "react-dom": "^19.2.5",
     "react-pageflip": "^2.0.3",
     "react-router-dom": "^7.14.2",
+    "react-toastify": "^11.1.0",
     "use-sound": "^5.0.0"
   },
   "devDependencies": {

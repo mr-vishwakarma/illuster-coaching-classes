@@ -4,6 +4,8 @@ import { AuthProvider } from '../shared/context/AuthContext';
 import { ThemeProvider } from '../shared/context/ThemeContext';
 import MouseFollower from '../shared/components/MouseFollower';
 import AppLayout from './AppLayout';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // ─── Scroll to top on route change ──────────────────────────────────────────
 const ScrollToTop = () => {
@@ -32,6 +34,7 @@ function App() {
           <ScrollToTop />
           <MouseFollower />
           <AppLayout />
+          <ToastContainer position="top-right" autoClose={3000} theme="dark" />
         </Router>
       </AuthProvider>
     </ThemeProvider>

@@ -3,13 +3,13 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowRight, User, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../shared/context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [role, setRole] = useState<'student' | 'tutor' | 'admin'>('student');
   const [email, setEmail] = useState('student@illuster.com');
   const [password, setPassword] = useState('student123');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -34,13 +34,13 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     const res = await login(email, password);
     if (res.success) {
+      toast.success(`Welcome back, ${res.user?.name}!`);
       navigate(from, { replace: true });
     } else {
-      setError(res.error || 'Login failed');
+      toast.error(res.error || 'Login failed. Please check your credentials.');
     }
     setIsLoading(false);
   };
@@ -105,15 +105,6 @@ const Login = () => {
             </button>
           </div>
 
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-red-500/10 text-red-500 p-4 rounded-2xl mb-8 flex items-center gap-3 text-sm font-bold border border-red-500/20"
-            >
-              <AlertCircle size={20} className="shrink-0" /> {error}
-            </motion.div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
