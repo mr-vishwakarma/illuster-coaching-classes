@@ -11,6 +11,7 @@ interface EnrollmentFinance {
     full_name: string;
     email: string;
     phone: string;
+    address: string;
   };
   course: {
     title: string;
@@ -30,6 +31,15 @@ export const FinanceManager = () => {
   const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentFinance | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [paymentRemarks, setPaymentRemarks] = useState('');
+  
+  // Student Profile Sync State
+  const [studentDetails, setStudentDetails] = useState({
+    id: '',
+    full_name: '',
+    email: '',
+    phone: '',
+    address: ''
+  });
 
   useEffect(() => {
     fetchFinanceData();
@@ -41,7 +51,7 @@ export const FinanceManager = () => {
       .from('course_enrollments')
       .select(`
         id,
-        student:profiles(full_name, email, phone),
+        student:profiles(id, full_name, email, phone, address),
         course:courses(title, price),
         payments:fee_payments(amount_paid)
       `)
@@ -60,6 +70,25 @@ export const FinanceManager = () => {
     if (!selectedEnrollment || paymentAmount <= 0) return;
 
     setIsLoading(true);
+    
+    // 1. Update Student Profile First
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: studentDetails.full_name,
+        email: studentDetails.email,
+        phone: studentDetails.phone,
+        address: studentDetails.address
+      })
+      .eq('id', studentDetails.id);
+
+    if (profileError) {
+      toast.error("Failed to update student profile");
+      setIsLoading(false);
+      return;
+    }
+
+    // 2. Insert Payment Record
     const { error } = await supabase
       .from('fee_payments')
       .insert([
@@ -191,6 +220,13 @@ export const FinanceManager = () => {
                         <button 
                           onClick={() => {
                             setSelectedEnrollment(enrollment);
+                            setStudentDetails({
+                              id: (enrollment.student as any).id,
+                              full_name: enrollment.student.full_name,
+                              email: enrollment.student.email || '',
+                              phone: enrollment.student.phone || '',
+                              address: (enrollment.student as any).address || ''
+                            });
                             setIsPaymentModalOpen(true);
                           }}
                           className="btn btn-primary px-4 py-1.5 text-xs flex items-center gap-2"
@@ -229,28 +265,74 @@ export const FinanceManager = () => {
               <h2 className="text-2xl font-display font-black text-gray-800 mb-1">Record Fee Payment</h2>
               <p className="text-sm text-gray-500 mb-6">Enter payment details for <span className="font-bold text-primary">{selectedEnrollment.student.full_name}</span></p>
 
-              <form onSubmit={handleAddPayment} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Amount Received (₹)</label>
-                  <div className="relative">
-                    <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <form onSubmit={handleAddPayment} className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
+                {/* Student Verification Fields */}
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-light mt-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Student Name</label>
                     <input 
                       required
-                      type="number"
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-light rounded-xl outline-none focus:border-primary/50"
-                      value={paymentAmount}
-                      onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
+                      value={studentDetails.full_name}
+                      onChange={(e) => setStudentDetails({...studentDetails, full_name: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mobile Number</label>
+                    <input 
+                      required
+                      className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
+                      value={studentDetails.phone}
+                      onChange={(e) => setStudentDetails({...studentDetails, phone: e.target.value})}
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Remarks / Transaction ID</label>
-                  <textarea 
-                    className="w-full px-4 py-3 bg-gray-50 border border-light rounded-xl outline-none focus:border-primary/50"
-                    placeholder="e.g. Received via GPay / Cash"
-                    value={paymentRemarks}
-                    onChange={(e) => setPaymentRemarks(e.target.value)}
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Email Address</label>
+                  <input 
+                    required
+                    type="email"
+                    className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
+                    value={studentDetails.email}
+                    onChange={(e) => setStudentDetails({...studentDetails, email: e.target.value})}
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Residential Address</label>
+                  <textarea 
+                    rows={2}
+                    className="w-full px-3 py-2 bg-gray-50 border border-light rounded-lg text-sm font-bold"
+                    value={studentDetails.address}
+                    onChange={(e) => setStudentDetails({...studentDetails, address: e.target.value})}
+                    placeholder="Student's permanent address..."
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-light mt-4 space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-primary font-black">Amount Received (₹)</label>
+                    <div className="relative">
+                      <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={18} />
+                      <input 
+                        required
+                        type="number"
+                        className="w-full pl-12 pr-4 py-3 bg-primary/5 border border-primary/20 rounded-xl outline-none focus:border-primary font-black text-lg"
+                        value={paymentAmount}
+                        onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Payment Remarks</label>
+                    <textarea 
+                      className="w-full px-4 py-3 bg-gray-50 border border-light rounded-xl outline-none focus:border-primary/50 text-sm"
+                      placeholder="e.g. Received via GPay / Cash"
+                      value={paymentRemarks}
+                      onChange={(e) => setPaymentRemarks(e.target.value)}
+                    />
+                  </div>
                 </div>
                 
                 <div className="pt-4 flex gap-3">

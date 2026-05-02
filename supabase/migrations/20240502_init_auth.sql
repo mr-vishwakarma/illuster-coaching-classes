@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
   avatar_url TEXT,
-  email TEXT, -- Added for receipt generation
-  phone TEXT, -- Added for receipt generation
+  email TEXT,
+  phone TEXT,
+  address TEXT, -- Added for complete student records
   role TEXT DEFAULT 'student' CHECK (role IN ('student', 'tutor', 'admin')),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

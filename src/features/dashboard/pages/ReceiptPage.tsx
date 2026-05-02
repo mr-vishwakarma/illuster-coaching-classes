@@ -11,6 +11,7 @@ interface ReceiptData {
     full_name: string;
     email: string;
     phone: string;
+    address: string;
   };
   course: {
     title: string;
@@ -43,7 +44,7 @@ const ReceiptPage = () => {
       .select(`
         id,
         enrolled_at,
-        student:profiles(full_name, email, phone),
+        student:profiles(full_name, email, phone, address),
         course:courses(title, price),
         payments:fee_payments(id, amount_paid, payment_date, remarks)
       `)
@@ -131,6 +132,7 @@ const ReceiptPage = () => {
                 <div className="text-sm text-gray-500 mt-1">
                   <p>{data.student.email || 'Email not provided'}</p>
                   <p>{data.student.phone || 'Phone not provided'}</p>
+                  <p className="mt-2 text-xs italic">{data.student.address}</p>
                 </div>
               </div>
               <div className="text-right">
