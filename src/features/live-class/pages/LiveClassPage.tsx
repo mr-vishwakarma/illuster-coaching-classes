@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, Video, VideoOff, MonitorUp, 
   Hand, MessageSquare, Users, Settings, 
-  PhoneOff, Send, MoreVertical, Maximize,
+  PhoneOff, Send, Maximize,
   X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -134,7 +134,7 @@ const LiveClass = () => {
     setIsHandRaised(!isHandRaised);
     if (!isHandRaised) {
       toast.info("Your hand is raised! The teacher will address you shortly.", {
-        icon: "✋",
+        icon: () => <span>✋</span>,
         position: "bottom-center"
       });
     }
