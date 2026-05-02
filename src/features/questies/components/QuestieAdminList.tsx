@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MessageSquare, CheckCircle2, Clock, Send, User, ChevronRight } from 'lucide-react';
+import { MessageSquare, CheckCircle2, Send, User } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import type { Questie } from '../types';
 
@@ -116,7 +116,7 @@ export const QuestieAdminList = () => {
               <div className="bg-white p-5 rounded-xl border border-light shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded-full bg-primary-dark text-white flex items-center justify-center font-bold text-xs">
-                    {(q as any).profiles?.full_name?.charAt(0) || 'S'}
+                    {(selectedQuestie as any).profiles?.full_name?.charAt(0) || 'S'}
                   </div>
                   <div>
                     <p className="text-xs font-black text-gray-800">{(selectedQuestie as any).profiles?.full_name || 'Student'}</p>

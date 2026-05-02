@@ -6,7 +6,7 @@ import { courses } from '../../courses';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
-import { HelpCircle, MessageSquare } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { user } = useAuth();

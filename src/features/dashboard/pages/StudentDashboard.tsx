@@ -6,7 +6,7 @@ import { courses, studyMaterials } from '../../courses';
 import { upcomingClasses } from '../../live-class';
 import { QuestieForm } from '../../questies/components/QuestieForm';
 import { QuestieList } from '../../questies/components/QuestieList';
-import { MessageSquare, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
