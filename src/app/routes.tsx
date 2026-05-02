@@ -14,6 +14,7 @@ const LiveClassPage = lazy(() => import('../features/live-class/pages/LiveClassP
 const AboutPage = lazy(() => import('../features/about/pages/AboutPage'));
 const GalleryPage = lazy(() => import('../features/about/pages/GalleryPage'));
 const RequestCallbackPage = lazy(() => import('../features/about/pages/RequestCallbackPage'));
+const ReceiptPage = lazy(() => import('../features/dashboard/pages/ReceiptPage'));
 
 // ─── Route definitions ──────────────────────────────────────────────────────
 const AppRoutes = () => {
@@ -43,6 +44,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <LiveClassPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/receipt/:enrollmentId"
+          element={
+            <ProtectedRoute>
+              <ReceiptPage />
             </ProtectedRoute>
           }
         />

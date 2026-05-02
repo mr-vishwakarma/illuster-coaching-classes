@@ -12,12 +12,13 @@ const AppLayout = () => {
   const isLogin = pathname === '/login';
   const isRequestCallback = pathname === '/request-callback';
   const isDashboard = pathname.startsWith('/dashboard');
+  const isReceipt = pathname.startsWith('/receipt');
 
-  const hideFooter = isLiveClass || isLogin || isRequestCallback || isDashboard;
+  const hideFooter = isLiveClass || isLogin || isRequestCallback || isDashboard || isReceipt;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#050505]">
-      {(!isLiveClass && !isDashboard) && <Navbar />}
+      {(!isLiveClass && !isDashboard && !isReceipt) && <Navbar />}
       <main className="flex-grow">
         <ErrorBoundary>
           <AppRoutes />

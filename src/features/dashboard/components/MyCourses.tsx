@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Video, Clock } from 'lucide-react';
+import { BookOpen, Video, Clock, FileText } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { useAuth } from '../../../shared/context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 interface EnrolledCourse {
@@ -23,6 +23,7 @@ interface EnrolledCourse {
 
 export const MyCourses = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -100,11 +101,20 @@ export const MyCourses = () => {
                           {due > 0 ? `₹${due} Remaining` : 'Fully Paid'}
                         </span>
                       </div>
-                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full transition-all duration-1000 ${due > 0 ? 'bg-orange-500' : 'bg-green-500'}`}
-                          style={{ width: `${(paid / total) * 100}%` }}
-                        ></div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1 h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full transition-all duration-1000 ${due > 0 ? 'bg-orange-500' : 'bg-green-500'}`}
+                            style={{ width: `${(paid / total) * 100}%` }}
+                          ></div>
+                        </div>
+                        <button 
+                          onClick={() => navigate(`/receipt/${enr.id}`)}
+                          className="p-1.5 hover:bg-gray-200 text-gray-500 rounded-lg transition-colors"
+                          title="View Receipt"
+                        >
+                          <FileText size={16} />
+                        </button>
                       </div>
                     </div>
 

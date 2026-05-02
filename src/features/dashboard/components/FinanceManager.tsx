@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { IndianRupee, Plus, Search, TrendingUp } from 'lucide-react';
+import { IndianRupee, Plus, Search, TrendingUp, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,6 +9,8 @@ interface EnrollmentFinance {
   id: string;
   student: {
     full_name: string;
+    email: string;
+    phone: string;
   };
   course: {
     title: string;
@@ -19,6 +22,7 @@ interface EnrollmentFinance {
 }
 
 export const FinanceManager = () => {
+  const navigate = useNavigate();
   const [enrollments, setEnrollments] = useState<EnrollmentFinance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +41,7 @@ export const FinanceManager = () => {
       .from('course_enrollments')
       .select(`
         id,
-        student:profiles(full_name),
+        student:profiles(full_name, email, phone),
         course:courses(title, price),
         payments:fee_payments(amount_paid)
       `)
@@ -75,6 +79,11 @@ export const FinanceManager = () => {
       fetchFinanceData();
       setPaymentAmount(0);
       setPaymentRemarks('');
+      
+      // Offer to open receipt
+      if (window.confirm("Payment recorded! Would you like to view and print the receipt?")) {
+        navigate(`/receipt/${selectedEnrollment.id}`);
+      }
     }
     setIsLoading(false);
   };
@@ -171,15 +180,24 @@ export const FinanceManager = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => {
-                          setSelectedEnrollment(enrollment);
-                          setIsPaymentModalOpen(true);
-                        }}
-                        className="btn btn-primary px-4 py-1.5 text-xs flex items-center gap-2 ml-auto"
-                      >
-                        <Plus size={14} /> Log Payment
-                      </button>
+                      <div className="flex gap-2 justify-end">
+                        <button 
+                          onClick={() => navigate(`/receipt/${enrollment.id}`)}
+                          className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
+                          title="View Receipt"
+                        >
+                          <FileText size={18} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setSelectedEnrollment(enrollment);
+                            setIsPaymentModalOpen(true);
+                          }}
+                          className="btn btn-primary px-4 py-1.5 text-xs flex items-center gap-2"
+                        >
+                          <Plus size={14} /> Log Payment
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
