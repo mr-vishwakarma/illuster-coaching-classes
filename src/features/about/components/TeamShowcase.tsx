@@ -5,18 +5,18 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const teamMembers = [
   {
     id: 1,
-    name: "Dr. Vikram Seth",
+    name: "Ashish Solanki",
     role: "Founder & Chairman",
     image: "/src/assets/images/team/founder.png",
-    bio: "Dr. Vikram Seth has over 20 years of experience in the education sector. He founded Illuster with a vision to provide high-quality, accessible coaching for competitive exams. His leadership has guided thousands of students to success in JEE and NEET.",
+    bio: "Ashish Solanki has over 20 years of experience in the education sector. He founded Illuster with a vision to provide high-quality, accessible coaching for competitive exams. His leadership has guided thousands of students to success in JEE and NEET.",
     highlights: ["PhD in Physics", "20+ Years Experience", "Visionary Leader"]
   },
   {
     id: 2,
-    name: "Sanjana Kapoor",
+    name: "Abhishek Soni",
     role: "Managing Director",
     image: "/src/assets/images/team/director.png",
-    bio: "Sanjana Kapoor oversees the strategic direction and operations at Illuster. With a background in management and a passion for education, she ensures that our students receive the best resources and support to excel in their academic journeys.",
+    bio: "Abhishek Soni oversees the strategic direction and operations at Illuster. With a background in management and a passion for education, she ensures that our students receive the best resources and support to excel in their academic journeys.",
     highlights: ["MBA from IIM", "Operational Excellence", "Student-Centric Approach"]
   },
   {
