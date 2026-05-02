@@ -37,7 +37,7 @@ export const FinanceManager = () => {
       .from('course_enrollments')
       .select(`
         id,
-        student:profiles!course_enrollments_student_id_fkey(full_name),
+        student:profiles(full_name),
         course:courses(title, price),
         payments:fee_payments(amount_paid)
       `)

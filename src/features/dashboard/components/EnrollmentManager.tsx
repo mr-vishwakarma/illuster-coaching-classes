@@ -35,7 +35,7 @@ export const EnrollmentManager = () => {
         id,
         status,
         enrolled_at,
-        student:profiles!course_enrollments_student_id_fkey(full_name, avatar_url),
+        student:profiles(full_name, avatar_url),
         course:courses(title, price)
       `)
       .eq('status', 'pending')

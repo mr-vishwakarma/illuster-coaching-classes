@@ -21,8 +21,8 @@ CREATE TABLE courses (
 -- 3. Course Enrollments Table (Flexible ID)
 CREATE TABLE course_enrollments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  student_id UUID REFERENCES auth.users NOT NULL,
-  course_id TEXT REFERENCES courses(id) NOT NULL, -- Now references TEXT ID
+  student_id UUID REFERENCES profiles(id) NOT NULL, -- Now references profiles directly
+  course_id TEXT REFERENCES courses(id) NOT NULL,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'rejected')),
   enrolled_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(student_id, course_id)
