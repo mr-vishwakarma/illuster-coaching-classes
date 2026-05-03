@@ -12,8 +12,10 @@ import PerspectiveCarousel from '../../courses/components/PerspectiveCarousel';
 import StickyCardStack from '../../courses/components/StickyCardStack';
 import TestimonialMarquee from '../../testimonials/components/TestimonialMarquee';
 import AnimatedLogoBackground from '../../about/components/AnimatedLogoBackground';
+import { useTraffic } from '../../../shared/context/TrafficContext';
 
 const Home = () => {
+  const { activeUsers } = useTraffic();
   const [isLoading, setIsLoading] = React.useState(true);
   const [liveCourses, setLiveCourses] = React.useState<any[]>([]);
 
@@ -93,8 +95,16 @@ const Home = () => {
                 <div className="w-10 h-10 rounded-full border-2 border-black bg-gray-600 flex items-center justify-center text-xs overflow-hidden"><img src="https://i.pravatar.cc/150?u=3" alt="Student" /></div>
                 <div className="w-10 h-10 rounded-full border-2 border-black bg-gray-600 flex items-center justify-center text-xs overflow-hidden"><img src="https://i.pravatar.cc/150?u=4" alt="Student" /></div>
               </div>
-              <p className="text-sm text-gray-400 font-medium">
-                <span className="text-accent-orange font-bold">1 Million+</span> Students learning in our mastery programs
+              <p className="text-sm text-gray-400 font-medium flex items-center gap-2 flex-wrap">
+                <span className="text-accent-orange font-bold">1 Million+</span> Students Enrolled
+                <span className="hidden sm:block w-1 h-1 rounded-full bg-gray-600"></span>
+                <span className="flex items-center gap-1.5 text-green-400 font-bold">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  {activeUsers} Live Now
+                </span>
               </p>
             </motion.div>
 

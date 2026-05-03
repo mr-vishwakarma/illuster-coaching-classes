@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import Navbar from '../shared/components/Navbar';
 import Footer from '../shared/components/Footer';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
+import LiveTrafficBadge from '../shared/components/LiveTrafficBadge';
 import AppRoutes from './routes';
 
 // ─── Layout wrapper with conditional Navbar/Footer ───────────────────────────
@@ -23,6 +24,7 @@ const AppLayout = () => {
         <ErrorBoundary>
           <AppRoutes />
         </ErrorBoundary>
+        <LiveTrafficBadge />
       </main>
       {!hideFooter && <Footer />}
     </div>
