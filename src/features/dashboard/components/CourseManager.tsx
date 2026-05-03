@@ -40,7 +40,7 @@ export const CourseManager = () => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from('courses')
-      .select('*')
+      .select('id, title, description, category, price, image_url, is_published, created_at')
       .order('created_at', { ascending: false });
     
     if (error) {

@@ -38,7 +38,7 @@ export const MyCourses = () => {
       .select(`
         id,
         status,
-        course:courses(*),
+        course:courses(id, title, price),
         payments:fee_payments(amount_paid)
       `)
       .eq('student_id', user?.id);

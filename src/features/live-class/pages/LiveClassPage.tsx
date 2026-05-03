@@ -73,7 +73,7 @@ const LiveClass = () => {
   const fetchMessages = async () => {
     const { data } = await supabase
       .from('live_messages')
-      .select('*')
+      .select('id, user_id, user_name, message, is_teacher, created_at')
       .eq('session_id', sessionId)
       .order('created_at', { ascending: true });
     

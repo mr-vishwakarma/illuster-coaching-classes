@@ -14,12 +14,12 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
     try {
       const { data, error } = await supabase
         .from('questies')
-        .select('*')
+        .select('id, subject, question_text, status, answer_text, created_at, resolved_at')
         .eq('student_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setQuesties(data || []);
+      setQuesties((data as Questie[]) || []);
     } catch (err) {
       console.error('Error fetching questies:', err);
     } finally {

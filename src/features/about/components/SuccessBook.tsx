@@ -247,7 +247,7 @@ const SuccessBook = () => {
     try {
       const { data, error } = await supabase
         .from('success_diary')
-        .select('*')
+        .select('chapter, title, body, tag, image_url, image_label, accent_color, order_index')
         .order('order_index', { ascending: true });
 
       if (error) throw error;

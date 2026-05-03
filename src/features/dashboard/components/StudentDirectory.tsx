@@ -29,7 +29,7 @@ export const StudentDirectory = () => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, full_name, avatar_url, role, batch, phone, address, updated_at')
       .eq('role', 'student')
       .order('full_name', { ascending: true });
     

@@ -28,7 +28,7 @@ const Home = () => {
   const fetchLiveCourses = async () => {
     const { data } = await supabase
       .from('courses')
-      .select('*')
+      .select('id, title, description, category, price, image_url, is_published')
       .eq('is_published', true)
       .limit(6);
     

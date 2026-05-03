@@ -32,7 +32,7 @@ const CourseDetail = () => {
     if (id) {
       const { data } = await supabase
         .from('courses')
-        .select('*')
+        .select('id, title, description, category, price, image_url, is_published')
         .eq('id', id)
         .single();
       
