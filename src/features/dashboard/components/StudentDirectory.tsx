@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, UserPlus, Phone, MapPin, GraduationCap, Shield } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
@@ -15,31 +15,41 @@ interface Profile {
   updated_at: string;
 }
 
+const PAGE_SIZE = 24;
+
 export const StudentDirectory = () => {
   const [students, setStudents] = useState<Profile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<Profile | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    fetchStudents();
+    fetchStudents(true);
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async (reset = false) => {
     setIsLoading(true);
-    const { data, error } = await supabase
+    const from = reset ? 0 : students.length;
+    const to = from + PAGE_SIZE - 1;
+
+    const { data, error, count } = await supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, role, batch, phone, address, updated_at')
+      .select('id, full_name, avatar_url, role, batch, phone, address, updated_at', { count: 'exact' })
       .eq('role', 'student')
-      .order('full_name', { ascending: true });
+      .order('full_name', { ascending: true })
+      .range(from, to);
     
     if (error) {
       toast.error("Failed to load student directory");
     } else {
-      setStudents(data || []);
+      setStudents(prev => reset ? (data || []) : [...prev, ...(data || [])]);
+      setHasMore((data?.length || 0) === PAGE_SIZE);
+      if (count !== null) setTotalCount(count);
     }
     setIsLoading(false);
-  };
+  }, [students.length]);
 
   const handleUpdateBatch = async (studentId: string, newBatch: string) => {
     const { error } = await supabase
@@ -50,7 +60,7 @@ export const StudentDirectory = () => {
     if (error) toast.error("Batch update failed");
     else {
       toast.success("Batch updated successfully!");
-      fetchStudents();
+      fetchStudents(true);
     }
   };
 
@@ -74,7 +84,7 @@ export const StudentDirectory = () => {
           />
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-400 font-bold">
-          <GraduationCap size={18} /> {students.length} Total Students
+          <GraduationCap size={18} /> {totalCount || students.length} Total Students
         </div>
       </div>
 
@@ -155,6 +165,19 @@ export const StudentDirectory = () => {
           </div>
         )}
       </div>
+
+      {/* Load More */}
+      {hasMore && !searchTerm && (
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={() => fetchStudents(false)}
+            disabled={isLoading}
+            className="px-8 py-3 bg-gray-100 hover:bg-primary/10 text-gray-600 hover:text-primary rounded-xl text-xs font-black uppercase tracking-widest transition-all disabled:opacity-50"
+          >
+            {isLoading ? 'Loading...' : `Load More Students`}
+          </button>
+        </div>
+      )}
 
       {/* Student Detail Modal (Simplified for Phase 6) */}
       <AnimatePresence>

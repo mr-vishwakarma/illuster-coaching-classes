@@ -75,9 +75,10 @@ const LiveClass = () => {
       .from('live_messages')
       .select('id, user_id, user_name, message, is_teacher, created_at')
       .eq('session_id', sessionId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false })
+      .limit(50);
     
-    if (data) setMessages(data);
+    if (data) setMessages(data.reverse());
     setTimeout(scrollToBottom, 100);
   };
 
@@ -85,7 +86,7 @@ const LiveClass = () => {
     const { data } = await supabase
       .from('live_attendance')
       .select(`
-        *,
+        user_id,
         profiles:user_id (full_name, role, avatar_url)
       `)
       .eq('session_id', sessionId);

@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare, CheckCircle2, Send, User } from 'lucide-react';
 import { supabase } from '../../../shared/lib/supabase';
 import type { Questie } from '../types';
+
+const PAGE_SIZE = 20;
 
 export const QuestieAdminList = () => {
   const [questies, setQuesties] = useState<Questie[]>([]);
@@ -9,29 +11,36 @@ export const QuestieAdminList = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [answer, setAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    fetchQuesties();
+    fetchQuesties(true);
   }, []);
 
-  const fetchQuesties = async () => {
+  const fetchQuesties = useCallback(async (reset = false) => {
     try {
+      setIsLoading(true);
+      const from = reset ? 0 : questies.length;
+      const to = from + PAGE_SIZE - 1;
+
       const { data, error } = await supabase
         .from('questies')
         .select(`
-          *,
+          id, subject, question_text, status, answer_text, created_at, resolved_at,
           profiles:student_id (full_name)
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
-      setQuesties(data || []);
+      setQuesties(prev => reset ? ((data as any) || []) : [...prev, ...((data as any) || [])]);
+      setHasMore((data?.length || 0) === PAGE_SIZE);
     } catch (err) {
       console.error('Error fetching questies:', err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [questies.length]);
 
   const handleResolve = async (qId: string) => {
     if (!answer.trim()) return;
@@ -50,7 +59,7 @@ export const QuestieAdminList = () => {
       
       setAnswer('');
       setSelectedId(null);
-      fetchQuesties();
+      fetchQuesties(true);
     } catch (err) {
       console.error('Error resolving questie:', err);
       alert('Failed to submit answer.');
@@ -95,6 +104,17 @@ export const QuestieAdminList = () => {
               </div>
             </div>
           ))}
+          {hasMore && (
+            <div className="p-3 border-t border-light">
+              <button
+                onClick={() => fetchQuesties(false)}
+                disabled={isLoading}
+                className="w-full py-2 bg-gray-50 hover:bg-primary/5 text-gray-500 hover:text-primary rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+              >
+                {isLoading ? 'Loading...' : 'Load More'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
