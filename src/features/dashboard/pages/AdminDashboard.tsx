@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, BookOpen, IndianRupee, AlertCircle, Plus, Edit, ArrowUpRight, ArrowDownRight, Video, PlayCircle } from 'lucide-react';
+import { Users, BookOpen, IndianRupee, AlertCircle, Plus, Edit, ArrowUpRight, ArrowDownRight, Video, PlayCircle, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { adminStats } from '../';
 import { CourseManager } from '../components/CourseManager';
@@ -10,6 +10,7 @@ import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
 import { DashboardHeader } from '../components/DashboardHeader';
+import { DatabaseHealth } from '../components/DatabaseHealth';
 import { HelpCircle } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -42,7 +43,8 @@ const AdminDashboard = () => {
             { id: 'students', icon: <Users size={20} />, label: 'Student Management' },
             { id: 'courses', icon: <BookOpen size={20} />, label: 'Course Catalog' },
             { id: 'questies', icon: <HelpCircle size={20} />, label: 'Doubt Portal' },
-            { id: 'finance', icon: <IndianRupee size={20} />, label: 'Finance & Fees' }
+            { id: 'finance', icon: <IndianRupee size={20} />, label: 'Finance & Fees' },
+            { id: 'health', icon: <Database size={20} />, label: 'System Health' }
           ].map(item => (
             <button
               key={item.id}
@@ -302,8 +304,15 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* System Health Tab */}
+        {activeTab === 'health' && (
+          <div className="flex flex-col gap-6">
+            <DatabaseHealth />
+          </div>
+        )}
+
         {/* Other tabs placeholders */}
-        {activeTab !== 'overview' && activeTab !== 'live' && activeTab !== 'questies' && activeTab !== 'courses' && activeTab !== 'students' && activeTab !== 'finance' && (
+        {activeTab !== 'overview' && activeTab !== 'live' && activeTab !== 'questies' && activeTab !== 'courses' && activeTab !== 'students' && activeTab !== 'finance' && activeTab !== 'health' && (
           <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
             <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg-main)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--text-light)' }}>
               {activeTab === 'students' ? <Users size={32} /> : activeTab === 'courses' ? <BookOpen size={32} /> : <IndianRupee size={32} />}
