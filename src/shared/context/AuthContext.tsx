@@ -48,6 +48,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getProfile = async (id: string, email: string): Promise<User | null> => {
     try {
+      const cacheKey = `profile_${id}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
+      
+      if (cached && cacheTime && Date.now() - Number(cacheTime) < 5 * 60 * 1000) { // 5 mins
+        return JSON.parse(cached);
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url, role')
@@ -57,21 +65,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       if (data) {
-        return {
+        const userObj: any = {
           id,
           email,
           name: data.full_name || email.split('@')[0],
-          role: data.role as UserRole,
+          role: data.role,
           avatar: data.avatar_url || '👤',
           password: '',
           enrolledCourses: [],
           joinDate: new Date().toLocaleDateString(),
         };
+        sessionStorage.setItem(cacheKey, JSON.stringify(userObj));
+        sessionStorage.setItem(`${cacheKey}_time`, String(Date.now()));
+        return userObj;
       }
+      return null;
     } catch (err) {
       console.error('Error fetching profile:', err);
+      return null;
     }
-    return null;
   };
 
 

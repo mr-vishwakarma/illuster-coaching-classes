@@ -245,14 +245,28 @@ const SuccessBook = () => {
 
   const fetchDiaryPages = async () => {
     try {
-      const { data, error } = await supabase
-        .from('success_diary')
-        .select('chapter, title, body, tag, image_url, image_label, accent_color, order_index')
-        .order('order_index', { ascending: true });
+      const cached = sessionStorage.getItem('diary_cache');
+      const cacheTime = sessionStorage.getItem('diary_cache_time');
+      let dataToUse = null;
 
-      if (error) throw error;
-      if (data) {
-        setPages(data.map((p, idx) => ({
+      if (cached && cacheTime && Date.now() - Number(cacheTime) < 24 * 60 * 60 * 1000) { // 24 hours
+        dataToUse = JSON.parse(cached);
+      } else {
+        const { data, error } = await supabase
+          .from('success_diary')
+          .select('chapter, title, body, tag, image_url, image_label, accent_color, order_index')
+          .order('order_index', { ascending: true });
+
+        if (error) throw error;
+        if (data) {
+          dataToUse = data;
+          sessionStorage.setItem('diary_cache', JSON.stringify(data));
+          sessionStorage.setItem('diary_cache_time', String(Date.now()));
+        }
+      }
+
+      if (dataToUse) {
+        setPages(dataToUse.map((p: any, idx: number) => ({
           side: idx % 2 === 0 ? 'left' : 'right',
           chapter: p.chapter,
           title: p.title,

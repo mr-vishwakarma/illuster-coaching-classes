@@ -26,6 +26,14 @@ const Home = () => {
   }, []);
 
   const fetchLiveCourses = async () => {
+    const cached = sessionStorage.getItem('courses_cache');
+    const cacheTime = sessionStorage.getItem('courses_cache_time');
+    
+    if (cached && cacheTime && Date.now() - Number(cacheTime) < 5 * 60 * 1000) { // 5 minutes
+      setLiveCourses(JSON.parse(cached));
+      return;
+    }
+
     const { data } = await supabase
       .from('courses')
       .select('id, title, description, category, price, image_url, is_published')
@@ -34,6 +42,8 @@ const Home = () => {
     
     if (data && data.length > 0) {
       setLiveCourses(data);
+      sessionStorage.setItem('courses_cache', JSON.stringify(data));
+      sessionStorage.setItem('courses_cache_time', String(Date.now()));
     }
   };
 
