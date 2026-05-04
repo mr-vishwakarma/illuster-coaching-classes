@@ -142,7 +142,7 @@ const Courses = () => {
                         <span className="text-orange-500 text-sm sm:text-xl md:text-3xl font-bold">₹{(course.price || 0).toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-white/40 text-[8px] md:text-sm line-through">₹{(course.originalPrice || 0).toLocaleString('en-IN')}</span>
+                        <span className="text-[var(--text-muted)] text-[8px] md:text-sm line-through">₹{(course.originalPrice || 0).toLocaleString('en-IN')}</span>
                         <span className="bg-white text-black text-[7px] md:text-[10px] font-black px-1.5 py-0.5 md:px-2 md:py-1 rounded">
                           {Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}%
                         </span>

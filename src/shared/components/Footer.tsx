@@ -26,7 +26,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-xs md:text-lg lg:text-xl text-white/40 max-w-2xl mx-auto mb-8 md:mb-12 leading-relaxed font-bold italic"
+            className="text-xs md:text-lg lg:text-xl text-[var(--text-muted)] max-w-2xl mx-auto mb-8 md:mb-12 leading-relaxed font-bold italic"
           >
             Join Illuster today. Let our expert mentors guide you through the toughest challenges.
           </motion.p>
@@ -58,7 +58,7 @@ const Footer = () => {
               <Link to="/" className="transition-transform hover:scale-105 origin-left w-fit">
                 <img src="/logo.png" alt="Illuster Logo" className="h-8 md:h-10 w-auto object-contain" />
               </Link>
-              <p className="text-white/40 text-sm md:text-base leading-relaxed font-bold italic max-w-xs">
+              <p className="text-[var(--text-muted)] text-sm md:text-base leading-relaxed font-bold italic max-w-xs">
                 Empowering students to crack the toughest exams with expert guidance and structured learning.
               </p>
             </div>

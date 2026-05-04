@@ -107,8 +107,8 @@ const AdminDashboard = () => {
             <div className="flex flex-col gap-6 mb-8">
               <div className="flex justify-between items-end mb-2">
                 <div>
-                  <h2 className="text-2xl font-display font-black text-gray-800">Pending Approvals</h2>
-                  <p className="text-sm text-gray-500">Review and verify new enrollment requests.</p>
+                  <h2 className="text-2xl font-display font-black text-[var(--text-main)]">Pending Approvals</h2>
+                  <p className="text-sm text-[var(--text-muted)]">Review and verify new enrollment requests.</p>
                 </div>
               </div>
               <EnrollmentManager />
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
               
               {/* Recent Enrollments */}
               <div className="lg:col-span-2 card">
-                <div className="flex justify-between items-center p-6 border-b border-light">
+                <div className="flex justify-between items-center p-6 border-b border-[var(--border-light)]">
                   <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', margin: 0 }}>Recent Student Enrollments</h3>
                   <button className="text-primary text-sm font-semibold hover:underline">View All</button>
                 </div>

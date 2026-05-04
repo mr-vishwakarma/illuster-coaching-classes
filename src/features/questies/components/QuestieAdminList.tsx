@@ -75,9 +75,9 @@ export const QuestieAdminList = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-[700px]">
       {/* Sidebar List */}
-      <div className="lg:w-1/3 bg-white border border-light rounded-2xl overflow-hidden flex flex-col">
-        <div className="p-4 bg-gray-50 border-b border-light flex justify-between items-center">
-          <h3 className="font-bold text-sm uppercase tracking-widest text-gray-500">Doubt Queue</h3>
+      <div className="lg:w-1/3 bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl overflow-hidden flex flex-col">
+        <div className="p-4 bg-[var(--bg-main)] border-b border-[var(--border-light)] flex justify-between items-center">
+          <h3 className="font-bold text-sm uppercase tracking-widest text-[var(--text-muted)]">Doubt Queue</h3>
           <span className="badge bg-primary text-white">{questies.filter(q => q.status === 'pending').length} New</span>
         </div>
         <div className="flex-1 overflow-y-auto">
@@ -85,8 +85,8 @@ export const QuestieAdminList = () => {
             <div 
               key={q.id}
               onClick={() => setSelectedId(q.id)}
-              className={`p-4 cursor-pointer border-b border-light transition-all ${
-                selectedId === q.id ? 'bg-primary-light border-l-4 border-l-primary' : 'hover:bg-gray-50'
+              className={`p-4 cursor-pointer border-b border-[var(--border-light)] transition-all ${
+                selectedId === q.id ? 'bg-[var(--primary-light)] border-l-4 border-l-primary' : 'hover:bg-[var(--bg-main)]'
               }`}
             >
               <div className="flex justify-between items-start mb-2">
@@ -95,8 +95,8 @@ export const QuestieAdminList = () => {
                   {q.status}
                 </span>
               </div>
-              <p className="text-sm font-bold text-gray-800 line-clamp-1 mb-1">{q.question_text}</p>
-              <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold">
+              <p className="text-sm font-bold text-[var(--text-main)] line-clamp-1 mb-1">{q.question_text}</p>
+              <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] font-bold">
                 <User size={10} />
                 <span>{(q as any).profiles?.full_name || 'Anonymous Student'}</span>
                 <span>•</span>
@@ -105,11 +105,11 @@ export const QuestieAdminList = () => {
             </div>
           ))}
           {hasMore && (
-            <div className="p-3 border-t border-light">
+            <div className="p-3 border-t border-[var(--border-light)]">
               <button
                 onClick={() => fetchQuesties(false)}
                 disabled={isLoading}
-                className="w-full py-2 bg-gray-50 hover:bg-primary/5 text-gray-500 hover:text-primary rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                className="w-full py-2 bg-[var(--bg-main)] hover:bg-primary/5 text-[var(--text-muted)] hover:text-primary rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
               >
                 {isLoading ? 'Loading...' : 'Load More'}
               </button>
@@ -119,12 +119,12 @@ export const QuestieAdminList = () => {
       </div>
 
       {/* Main Detail View */}
-      <div className="lg:w-2/3 bg-white border border-light rounded-2xl overflow-hidden flex flex-col">
+      <div className="lg:w-2/3 bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl overflow-hidden flex flex-col">
         {selectedQuestie ? (
           <div className="flex flex-col h-full">
-            <div className="p-6 bg-gray-50 border-b border-light">
+            <div className="p-6 bg-[var(--bg-main)] border-b border-[var(--border-light)]">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-display font-black">Question Detail</h2>
+                <h2 className="text-xl font-display font-black text-[var(--text-main)]">Question Detail</h2>
                 <div className="flex gap-2">
                   <span className="badge bg-primary-light text-primary font-bold uppercase text-[10px]">{selectedQuestie.subject}</span>
                   <span className={`badge font-bold uppercase text-[10px] ${selectedQuestie.status === 'resolved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
@@ -133,29 +133,29 @@ export const QuestieAdminList = () => {
                 </div>
               </div>
               
-              <div className="bg-white p-5 rounded-xl border border-light shadow-sm">
+              <div className="bg-[var(--bg-card)] p-5 rounded-xl border border-[var(--border-light)] shadow-sm">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 rounded-full bg-primary-dark text-white flex items-center justify-center font-bold text-xs">
                     {(selectedQuestie as any).profiles?.full_name?.charAt(0) || 'S'}
                   </div>
                   <div>
-                    <p className="text-xs font-black text-gray-800">{(selectedQuestie as any).profiles?.full_name || 'Student'}</p>
-                    <p className="text-[9px] text-gray-400 font-bold uppercase">Asked {new Date(selectedQuestie.created_at).toLocaleString()}</p>
+                    <p className="text-xs font-black text-[var(--text-main)]">{(selectedQuestie as any).profiles?.full_name || 'Student'}</p>
+                    <p className="text-[9px] text-[var(--text-muted)] font-bold uppercase">Asked {new Date(selectedQuestie.created_at).toLocaleString()}</p>
                   </div>
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{selectedQuestie.question_text}</p>
+                <p className="text-[var(--text-main)] text-sm leading-relaxed whitespace-pre-wrap opacity-80">{selectedQuestie.question_text}</p>
               </div>
             </div>
 
             <div className="flex-1 p-6 overflow-y-auto">
               {selectedQuestie.status === 'resolved' ? (
-                <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
-                  <div className="flex items-center gap-2 mb-4 text-green-700">
+                <div className="bg-green-500/5 border border-green-500/10 rounded-2xl p-6">
+                  <div className="flex items-center gap-2 mb-4 text-green-600">
                     <CheckCircle2 size={20} />
                     <h4 className="font-bold uppercase tracking-widest text-xs">Official Answer</h4>
                   </div>
-                  <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{selectedQuestie.answer_text}</p>
-                  <div className="mt-6 pt-4 border-t border-green-200/50 flex justify-between items-center text-[10px] text-green-600 font-bold uppercase">
+                  <p className="text-[var(--text-main)] text-sm leading-relaxed whitespace-pre-wrap opacity-90">{selectedQuestie.answer_text}</p>
+                  <div className="mt-6 pt-4 border-t border-green-500/10 flex justify-between items-center text-[10px] text-green-600 font-bold uppercase">
                     <span>Resolved at {new Date(selectedQuestie.resolved_at!).toLocaleString()}</span>
                   </div>
                 </div>
@@ -169,7 +169,7 @@ export const QuestieAdminList = () => {
                     value={answer}
                     onChange={e => setAnswer(e.target.value)}
                     placeholder="Explain the solution step-by-step..."
-                    className="w-full flex-1 p-4 border border-light rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none text-sm leading-relaxed"
+                    className="w-full flex-1 p-4 border border-[var(--border-light)] bg-[var(--bg-main)] text-[var(--text-main)] rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none text-sm leading-relaxed"
                   />
                   <div className="flex justify-end">
                     <button 
@@ -185,7 +185,7 @@ export const QuestieAdminList = () => {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400 p-10 text-center">
+          <div className="flex flex-col items-center justify-center h-full text-[var(--text-muted)] p-10 text-center">
             <MessageSquare size={64} className="mb-4 opacity-10" />
             <h3 className="text-lg font-bold">Select a doubt from the queue</h3>
             <p className="text-xs max-w-[200px] mt-1 leading-relaxed">Choose a student's question to view details and provide a solution.</p>

@@ -13,7 +13,7 @@ const About = () => {
   ];
 
   return (
-    <div className="pt-32 md:pt-40 bg-[#050505] text-white overflow-hidden">
+    <div className="pt-32 md:pt-40 bg-[var(--bg-main)] text-[var(--text-main)] overflow-hidden">
       
       {/* Hero Section */}
       <section className="relative py-20 px-6">
@@ -30,7 +30,7 @@ const About = () => {
               Redefining the <br />
               <span className="text-orange-500 italic">Standards of Excellence.</span>
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-white/50 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium px-4 md:px-0">
+            <p className="text-base md:text-lg lg:text-xl text-[var(--text-muted)] max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium px-4 md:px-0">
               Illuster Coaching Classes is more than just an institute; it's a launchpad for India's brightest minds. We combine traditional pedagogy with cutting-edge technology.
             </p>
             <div className="flex flex-wrap justify-center gap-3 md:gap-4">
@@ -38,7 +38,7 @@ const About = () => {
                 <ImageIcon size={18} className="md:w-5 md:h-5" />
                 Explore Gallery
               </Link>
-              <Link to="/request-callback" className="flex items-center gap-2 px-6 py-3.5 md:px-8 md:py-4 bg-white/5 border border-white/10 rounded-xl md:rounded-2xl font-bold hover:bg-white/10 transition-all text-sm md:text-base">
+              <Link to="/request-callback" className="flex items-center gap-2 px-6 py-3.5 md:px-8 md:py-4 bg-[var(--bg-card)] border border-[var(--border-light)] rounded-xl md:rounded-2xl font-bold hover:bg-[var(--primary-light)] transition-all text-sm md:text-base text-[var(--text-main)]">
                 Talk to Us <ArrowRight size={16} className="md:w-[18px] md:h-[18px]" />
               </Link>
             </div>
@@ -50,7 +50,7 @@ const About = () => {
       <TeamShowcase />
 
       {/* Stats Section */}
-      <section className="py-20 border-y border-white/5 bg-[#0a0a0a]">
+      <section className="py-20 border-y border-[var(--border-light)] bg-[var(--bg-card)]">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, idx) => (
@@ -87,7 +87,7 @@ const About = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Personalized Growth</h3>
-                    <p className="text-white/40 leading-relaxed font-medium">We believe every student has a unique learning curve. Our methodology adapts to the student, not the other way around.</p>
+                    <p className="text-[var(--text-muted)] leading-relaxed font-medium">We believe every student has a unique learning curve. Our methodology adapts to the student, not the other way around.</p>
                   </div>
                 </div>
                 <div className="flex gap-6">
@@ -96,7 +96,7 @@ const About = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Unmatched Integrity</h3>
-                    <p className="text-white/40 leading-relaxed font-medium">Results are earned through hard work. We maintain the highest standards of academic honesty and transparency.</p>
+                    <p className="text-[var(--text-muted)] leading-relaxed font-medium">We maintain the highest standards of academic honesty and transparency.</p>
                   </div>
                 </div>
                 <div className="flex gap-6">
@@ -105,7 +105,7 @@ const About = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold mb-2">Elite Results</h3>
-                    <p className="text-white/40 leading-relaxed font-medium">Our goal isn't just to pass; it's to dominate. Our students consistently rank in the top percentile nationally.</p>
+                    <p className="text-[var(--text-muted)] leading-relaxed font-medium">Our goal isn't just to pass; it's to dominate. Our students consistently rank in the top percentile nationally.</p>
                   </div>
                 </div>
               </div>
@@ -124,7 +124,7 @@ const About = () => {
                       🏛️
                     </div>
                     <h3 className="text-2xl font-black mb-4 tracking-tight">Est. 2012</h3>
-                    <p className="text-white/30 font-medium">A legacy of over 12 years in academic excellence.</p>
+                    <p className="text-[var(--text-muted)] font-medium">A legacy of over 12 years in academic excellence.</p>
                  </div>
               </div>
             </motion.div>

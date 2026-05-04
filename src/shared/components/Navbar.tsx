@@ -30,7 +30,7 @@ const Navbar = () => {
     <nav 
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'py-2 bg-black/90 backdrop-blur-md shadow-lg border-b border-white/10' 
+          ? 'py-2 bg-[var(--bg-card)]/90 backdrop-blur-md shadow-lg border-b border-[var(--border-light)]' 
           : 'py-3 md:py-5 bg-transparent'
       }`}
     >
@@ -44,7 +44,7 @@ const Navbar = () => {
           <div className="flex items-center gap-2 md:gap-5 shrink-0">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-white/10 text-white transition-colors border border-transparent hover:border-white/20"
+              className="p-2 rounded-full hover:bg-[var(--text-main)]/10 text-[var(--text-main)] transition-colors border border-transparent hover:border-[var(--border-light)]"
               aria-label="Toggle Theme"
             >
               {theme === 'light' ? <Moon size={18} className="md:w-5 md:h-5" /> : <Sun size={18} className="md:w-5 md:h-5" />}
@@ -52,25 +52,25 @@ const Navbar = () => {
 
             {isAuthenticated ? (
               <div className="flex items-center gap-2 md:gap-4">
-                <Link to="/dashboard" className="flex items-center gap-2 font-bold text-sm text-white">
-                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white text-black flex items-center justify-center shadow-md text-xs md:text-sm">
+                <Link to="/dashboard" className="flex items-center gap-2 font-bold text-sm text-[var(--text-main)]">
+                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[var(--text-main)] text-[var(--bg-main)] flex items-center justify-center shadow-md text-xs md:text-sm">
                     {user?.avatar}
                   </div>
                   <span className="hidden sm:block">Dashboard</span>
                 </Link>
                 <button 
                   onClick={logout} 
-                  className="hidden md:flex px-4 py-2 rounded-full border border-white text-white text-xs font-bold hover:bg-white hover:text-black transition-all"
+                  className="hidden md:flex px-4 py-2 rounded-full border border-[var(--text-main)] text-[var(--text-main)] text-xs font-bold hover:bg-[var(--text-main)] hover:text-[var(--bg-main)] transition-all"
                 >
                   Logout
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-2 md:gap-4">
-                <Link to="/login" className="hidden sm:block text-xs md:text-sm font-bold text-white hover:text-gray-300 transition-colors">
+                <Link to="/login" className="hidden sm:block text-xs md:text-sm font-bold text-[var(--text-main)] hover:text-[var(--primary)] transition-colors">
                   Log in
                 </Link>
-                <Link to="/login" className="bg-white text-black hover:bg-gray-200 px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold transition-colors whitespace-nowrap">
+                <Link to="/login" className="bg-[var(--text-main)] text-[var(--bg-main)] hover:opacity-80 px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-bold transition-colors whitespace-nowrap">
                   Enroll Now
                 </Link>
               </div>

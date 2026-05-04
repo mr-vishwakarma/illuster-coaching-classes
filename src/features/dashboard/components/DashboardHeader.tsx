@@ -12,10 +12,10 @@ export const DashboardHeader = () => {
         <Link to="/" className="hover:opacity-80 transition-all hover:scale-105 active:scale-95">
           <img src="/logo.png" alt="Illuster" className="h-8 md:h-10 w-auto" />
         </Link>
-        <div className="h-6 w-px bg-gray-200 hidden md:block" />
+        <div className="h-6 w-px bg-[var(--border-light)] hidden md:block" />
         <Link 
           to="/" 
-          className="hidden md:inline-flex items-center gap-2 text-gray-400 hover:text-primary transition-colors group"
+          className="hidden md:inline-flex items-center gap-2 text-[var(--text-muted)] hover:text-primary transition-colors group"
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           <span className="text-[10px] font-black uppercase tracking-widest">Back to Home</span>

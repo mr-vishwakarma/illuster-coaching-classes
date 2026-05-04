@@ -72,18 +72,18 @@ const TutorDashboard = () => {
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="card p-8 bg-gradient-to-br from-[#8a76ff]/5 to-transparent border-[#8a76ff]/20">
               <h2 className="text-xl font-display font-black mb-4">Welcome back, Prof. {user?.name.split(' ')[0]}</h2>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6">
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-6">
                 You have 4 doubts pending in the portal and your next live class starts in 2 hours.
               </p>
               <button onClick={() => setActiveTab('questies')} className="btn btn-primary px-8">Solve Doubts Now</button>
             </div>
             
             <div className="card p-8">
-              <h3 className="font-bold mb-4 flex items-center gap-2 text-gray-400 uppercase text-[10px] tracking-widest">
+              <h3 className="font-bold mb-4 flex items-center gap-2 text-[var(--text-muted)] opacity-60 uppercase text-[10px] tracking-widest">
                 <Video size={14} /> Quick Link
               </h3>
-              <Link to="/live-class" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all border border-light">
-                <div className="font-bold text-gray-800 text-sm">Start Teaching (Live)</div>
+              <Link to="/live-class" className="flex items-center justify-between p-4 bg-[var(--bg-main)] rounded-xl hover:bg-[var(--primary-light)] transition-all border border-[var(--border-light)]">
+                <div className="font-bold text-[var(--text-main)] text-sm">Start Teaching (Live)</div>
                 <PlayCircle className="text-red-600" />
               </Link>
             </div>
@@ -93,8 +93,8 @@ const TutorDashboard = () => {
         {activeTab === 'questies' && (
           <div className="flex flex-col gap-6">
             <div>
-              <h2 className="text-2xl font-display font-black text-gray-800">Doubt Portal</h2>
-              <p className="text-sm text-gray-500">Provide expert solutions to your assigned students.</p>
+              <h2 className="text-2xl font-display font-black text-[var(--text-main)]">Doubt Portal</h2>
+              <p className="text-sm text-[var(--text-muted)]">Provide expert solutions to your assigned students.</p>
             </div>
             <QuestieAdminList />
           </div>
@@ -104,7 +104,7 @@ const TutorDashboard = () => {
         {activeTab !== 'overview' && activeTab !== 'questies' && (
           <div className="card p-20 text-center">
             <h2 className="text-xl font-display font-black mb-4 capitalize">{activeTab.replace('-', ' ')}</h2>
-            <p className="text-gray-400 italic">This section is being customized for your tutoring workflow.</p>
+            <p className="text-[var(--text-muted)] italic">This section is being customized for your tutoring workflow.</p>
           </div>
         )}
 

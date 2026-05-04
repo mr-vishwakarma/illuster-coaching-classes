@@ -36,7 +36,7 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-32 bg-white/5 animate-pulse rounded-2xl border border-white/5" />
+          <div key={i} className="h-32 bg-[var(--bg-card)] animate-pulse rounded-2xl border border-[var(--border-light)]" />
         ))}
       </div>
     );
@@ -44,10 +44,10 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
 
   if (questies.length === 0) {
     return (
-      <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
-        <MessageSquare size={48} className="mx-auto text-gray-600 mb-4" />
-        <h3 className="text-xl font-bold text-gray-400">No questions yet</h3>
-        <p className="text-sm text-gray-500 mt-2">Your doubts will appear here once you submit them.</p>
+      <div className="text-center py-20 bg-[var(--bg-card)] rounded-3xl border border-dashed border-[var(--border-light)]">
+        <MessageSquare size={48} className="mx-auto text-[var(--text-muted)] mb-4 opacity-30" />
+        <h3 className="text-xl font-bold text-[var(--text-main)] opacity-50">No questions yet</h3>
+        <p className="text-sm text-[var(--text-muted)] mt-2">Your doubts will appear here once you submit them.</p>
       </div>
     );
   }
@@ -57,8 +57,8 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
       {questies.map((q) => (
         <div 
           key={q.id}
-          className={`bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 ${
-            expandedId === q.id ? 'ring-2 ring-[#8a76ff]/50' : 'hover:bg-white/[0.08]'
+          className={`bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl overflow-hidden transition-all duration-300 ${
+            expandedId === q.id ? 'ring-2 ring-[#8a76ff]/50' : 'hover:bg-[var(--bg-main)]'
           }`}
         >
           <div 
@@ -77,25 +77,25 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
                   {q.status}
                 </span>
               </div>
-              <p className="text-white text-sm font-medium line-clamp-2 leading-relaxed">
+              <p className="text-[var(--text-main)] text-sm font-medium line-clamp-2 leading-relaxed">
                 {q.question_text}
               </p>
-              <p className="text-[10px] text-gray-500 mt-2 uppercase font-bold tracking-tighter">
+              <p className="text-[10px] text-[var(--text-muted)] mt-2 uppercase font-bold tracking-tighter">
                 Asked on {new Date(q.created_at).toLocaleDateString()}
               </p>
             </div>
-            <button className="text-gray-500 mt-1">
+            <button className="text-[var(--text-muted)] mt-1">
               {expandedId === q.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </button>
           </div>
 
           {expandedId === q.id && (
             <div className="px-5 pb-5 pt-2 animate-in slide-in-from-top-2 duration-300">
-              <div className="h-px bg-white/10 mb-4" />
+              <div className="h-px bg-[var(--border-light)] mb-4" />
               <div className="space-y-4">
-                <div className="bg-white/5 p-4 rounded-xl">
-                  <p className="text-[10px] font-black uppercase text-gray-500 mb-2 tracking-widest">Your Full Question</p>
-                  <p className="text-white text-sm whitespace-pre-wrap leading-relaxed">{q.question_text}</p>
+                <div className="bg-[var(--bg-main)] p-4 rounded-xl">
+                  <p className="text-[10px] font-black uppercase text-[var(--text-muted)] mb-2 tracking-widest">Your Full Question</p>
+                  <p className="text-[var(--text-main)] text-sm whitespace-pre-wrap leading-relaxed opacity-80">{q.question_text}</p>
                 </div>
                 
                 {q.status === 'resolved' ? (
@@ -104,9 +104,9 @@ export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {
                       <CheckCircle2 size={14} className="text-green-400" />
                       <p className="text-[10px] font-black uppercase text-green-400 tracking-widest">Tutor's Answer</p>
                     </div>
-                    <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">{q.answer_text}</p>
+                    <p className="text-[var(--text-main)] text-sm whitespace-pre-wrap leading-relaxed opacity-90">{q.answer_text}</p>
                     {q.resolved_at && (
-                      <p className="text-[9px] text-gray-500 mt-3 font-bold uppercase tracking-tighter">
+                      <p className="text-[9px] text-[var(--text-muted)] mt-3 font-bold uppercase tracking-tighter">
                         Resolved on {new Date(q.resolved_at).toLocaleDateString()}
                       </p>
                     )}

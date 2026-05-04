@@ -108,7 +108,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-2" htmlFor="email">Email Address</label>
+              <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] ml-2" htmlFor="email">Email Address</label>
               <input
                 id="email"
                 type="email"
@@ -122,7 +122,7 @@ const Login = () => {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-2" htmlFor="password">Password</label>
+                <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] ml-2" htmlFor="password">Password</label>
                 <a href="#" className="text-[10px] font-black text-orange-500 hover:underline tracking-widest">Forgot?</a>
               </div>
               <input
@@ -156,7 +156,7 @@ const Login = () => {
           </div>
         </div>
 
-        <p className="text-center mt-10 text-white/40 font-medium">
+        <p className="text-center mt-10 text-[var(--text-muted)] font-medium">
           New here? <Link to="/#contact" className="text-white hover:text-orange-500 transition-colors underline decoration-white/20 underline-offset-4 ml-1">Contact Admissions</Link>
         </p>
 

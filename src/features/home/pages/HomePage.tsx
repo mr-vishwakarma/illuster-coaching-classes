@@ -75,7 +75,7 @@ const Home = () => {
       variants={containerVariants}
     >
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] md:min-h-[90vh] flex flex-col items-center justify-center pt-32 md:pt-36 overflow-hidden bg-black text-center" data-cursor="-orange">
+      <section className="relative min-h-[80vh] md:min-h-[90vh] flex flex-col items-center justify-center pt-32 md:pt-36 overflow-hidden bg-[var(--bg-main)] text-center" data-cursor="-orange">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-radial-gradient from-accent-orange/5 to-transparent z-0 opacity-50 blur-3xl"></div>
         <div className="absolute top-0 left-0 w-[800px] h-[800px] bg-radial-gradient from-accent-red/5 to-transparent z-0 opacity-50 blur-3xl"></div>
         
@@ -89,7 +89,7 @@ const Home = () => {
               LEARN. BUILD. GET PLACED.
             </motion.div>
             
-            <motion.h1 variants={itemVariants} className="font-display font-medium leading-[1.1] mb-6 md:mb-8 text-white max-w-5xl mx-auto min-h-[80px] md:min-h-[100px]">
+            <motion.h1 variants={itemVariants} className="font-display font-medium leading-[1.1] mb-6 md:mb-8 text-[var(--text-main)] max-w-5xl mx-auto min-h-[80px] md:min-h-[100px]">
               <Typewriter />
             </motion.h1>
             
@@ -296,34 +296,34 @@ const Home = () => {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="card p-5 md:p-10 lg:p-12 shadow-2xl border border-white/5"
+              className="card p-5 md:p-10 lg:p-12 shadow-2xl"
             >
-              <h3 className="text-xl md:text-3xl font-display font-black mb-6 md:mb-10 text-white">Request a Callback</h3>
+              <h3 className="text-xl md:text-3xl font-display font-black mb-6 md:mb-10 text-[var(--text-main)]">Request a Callback</h3>
               <form onSubmit={(e) => e.preventDefault()} className="space-y-4 md:space-y-6">
                 <div className="grid md:grid-cols-2 gap-4 md:gap-6">
                   <div className="space-y-1.5 md:space-y-2">
-                    <label className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-widest ml-1">Full Name</label>
-                    <input type="text" className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-orange-500 transition-all font-bold" placeholder="John Doe" />
+                    <label className="text-[10px] md:text-xs font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Full Name</label>
+                    <input type="text" className="input-field font-bold" placeholder="John Doe" />
                   </div>
                   <div className="space-y-1.5 md:space-y-2">
-                    <label className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-widest ml-1">Phone Number</label>
-                    <input type="tel" className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-orange-500 transition-all font-bold" placeholder="+91 98765 43210" />
+                    <label className="text-[10px] md:text-xs font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Phone Number</label>
+                    <input type="tel" className="input-field font-bold" placeholder="+91 98765 43210" />
                   </div>
                 </div>
                 <div className="space-y-1.5 md:space-y-2">
-                  <label className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-widest ml-1">Email Address</label>
-                  <input type="email" className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-orange-500 transition-all font-bold" placeholder="john@example.com" />
+                  <label className="text-[10px] md:text-xs font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Email Address</label>
+                  <input type="email" className="input-field font-bold" placeholder="john@example.com" />
                 </div>
                 <div className="space-y-1.5 md:space-y-2">
-                  <label className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-widest ml-1">Select Course</label>
-                  <select className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-orange-500 transition-all font-bold appearance-none">
-                    <option className="bg-black">Select a course</option>
-                    {displayCourses.map(c => <option key={c.id} className="bg-black">{c.title}</option>)}
+                  <label className="text-[10px] md:text-xs font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Select Course</label>
+                  <select className="input-field font-bold appearance-none">
+                    <option value="">Select a course</option>
+                    {displayCourses.map(c => <option key={c.id} value={c.title}>{c.title}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5 md:space-y-2">
-                  <label className="text-[10px] md:text-xs font-black text-white/40 uppercase tracking-widest ml-1">Your Message</label>
-                  <textarea className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-orange-500 transition-all font-bold h-24" placeholder="Tell us about your learning goals..."></textarea>
+                  <label className="text-[10px] md:text-xs font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Your Message</label>
+                  <textarea className="input-field font-bold h-24" placeholder="Tell us about your learning goals..."></textarea>
                 </div>
                 <button type="submit" className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm md:text-lg font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-xl shadow-orange-500/20">
                   Submit Inquiry <Send size={18} className="md:w-5 md:h-5" />
