@@ -10,8 +10,35 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../../shared/lib/supabase';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { toast } from 'react-toastify';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import AgoraRTC, { 
+  AgoraRTCProvider, 
+  useRTCClient,
+  useJoin,
+  useLocalMicrophoneTrack,
+  useLocalCameraTrack,
+  usePublish,
+  useRemoteUsers,
+  useRemoteAudioTracks,
+  RemoteUser
+} from "agora-rtc-react";
 
-const LiveClass = () => {
+const VideoPlayer = ({ track }: { track: any }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (track && ref.current) {
+      track.play(ref.current);
+    }
+    return () => {
+      if (track) {
+        track.stop();
+      }
+    };
+  }, [track]);
+  return <div ref={ref} className="w-full h-full [&>div>video]:object-cover" />;
+};
+
+const LiveClassRoom = () => {
   const { user } = useAuth();
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
@@ -24,19 +51,55 @@ const LiveClass = () => {
   // Real-time states
   const [messages, setMessages] = useState<any[]>([]);
   const [participants, setParticipants] = useState<any[]>([]);
+  const [roomChannel, setRoomChannel] = useState<RealtimeChannel | null>(null);
   const sessionId = "batch-a-sys-design"; 
+
+  // --- Agora Setup ---
+  const appId = import.meta.env.VITE_AGORA_APP_ID || "test-app-id";
+  const [isJoined, setIsJoined] = useState(true);
+  
+  const { isLoading: isMicLoading, localMicrophoneTrack } = useLocalMicrophoneTrack(isJoined);
+  const { isLoading: isCamLoading, localCameraTrack } = useLocalCameraTrack(isJoined);
+  
+  // Set enabled states based on UI toggles without destroying tracks
+  useEffect(() => {
+    if (localMicrophoneTrack) localMicrophoneTrack.setEnabled(!isMuted);
+  }, [isMuted, localMicrophoneTrack]);
+
+  useEffect(() => {
+    if (localCameraTrack) localCameraTrack.setEnabled(!isVideoOff);
+  }, [isVideoOff, localCameraTrack]);
+
+  usePublish([localMicrophoneTrack, localCameraTrack]);
+
+  useJoin({
+    appid: appId,
+    channel: sessionId,
+    token: null,
+    uid: user?.id
+  }, isJoined);
+
+  const remoteUsers = useRemoteUsers();
+  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
+
+  useEffect(() => {
+    audioTracks.forEach(track => track.play());
+  }, [audioTracks]);
+
+  // Identify Teacher
+  const isHost = user?.role === 'admin' || user?.role === 'tutor';
+  const teacherRemoteUser = remoteUsers.find(u => {
+    const p = participants.find(part => part.id === u.uid);
+    return p?.role === 'Host';
+  });
+  // -------------------
 
   useEffect(() => {
     if (!user) return;
 
-    // 1. Log Attendance & Fetch Participants
-    logAttendance();
-    fetchParticipants();
-
-    // 2. Fetch Initial Messages
     fetchMessages();
 
-    // 3. Subscribe to Realtime Chat & Attendance
+    // 1. Subscribe to Realtime Chat
     const chatChannel = supabase
       .channel('live-chat')
       .on(
@@ -49,22 +112,69 @@ const LiveClass = () => {
       )
       .subscribe();
 
-    const attendanceChannel = supabase
-      .channel('live-attendance')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'live_attendance', filter: `session_id=eq.${sessionId}` },
-        () => {
-          fetchParticipants();
+    // 2. Presence Channel for Attendance & States (Zero DB Overhead)
+    const presenceChannel = supabase.channel(`room-${sessionId}`, {
+      config: {
+        presence: {
+          key: user.id,
+        },
+      },
+    });
+
+    presenceChannel
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        const activeParticipants = Object.values(state).map((presences: any) => presences[0]);
+        
+        setParticipants(prevParticipants => {
+          // Show notification if someone raised their hand
+          if (user.role !== 'student') {
+            activeParticipants.forEach(p => {
+              const existingP = prevParticipants.find(ep => ep.id === p.id);
+              if (p.isHandRaised && (!existingP || !existingP.isHandRaised)) {
+                toast.info(`${p.name} raised their hand!`, { icon: () => <span>✋</span> });
+              }
+            });
+          }
+          return activeParticipants;
+        });
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            id: user.id,
+            name: user.name,
+            role: user.role === 'student' ? 'Student' : 'Host',
+            isMuted,
+            isVideoOff,
+            isHandRaised,
+            avatar: user.avatar
+          });
         }
-      )
-      .subscribe();
+      });
+
+    setRoomChannel(presenceChannel);
 
     return () => {
       supabase.removeChannel(chatChannel);
-      supabase.removeChannel(attendanceChannel);
+      supabase.removeChannel(presenceChannel);
     };
   }, [user]);
+
+  // Sync local UI states to Presence when toggled
+  useEffect(() => {
+    if (roomChannel && user) {
+      roomChannel.track({
+        id: user.id,
+        name: user.name,
+        role: user.role === 'student' ? 'Student' : 'Host',
+        isMuted,
+        isVideoOff,
+        isHandRaised,
+        avatar: user.avatar
+      });
+    }
+  }, [isMuted, isVideoOff, isHandRaised, roomChannel, user]);
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,33 +192,7 @@ const LiveClass = () => {
     setTimeout(scrollToBottom, 100);
   };
 
-  const fetchParticipants = async () => {
-    const { data } = await supabase
-      .from('live_attendance')
-      .select(`
-        user_id,
-        profiles:user_id (full_name, role, avatar_url)
-      `)
-      .eq('session_id', sessionId);
-    
-    if (data) {
-      setParticipants(data.map(p => ({
-        id: p.user_id,
-        name: (p as any).profiles?.full_name || 'Student',
-        role: (p as any).profiles?.role === 'student' ? 'Student' : 'Host',
-        isMuted: true,
-        isVideoOff: false
-      })));
-    }
-  };
 
-  const logAttendance = async () => {
-    if (!user) return;
-    await supabase.from('live_attendance').upsert({
-      session_id: sessionId,
-      user_id: user.id
-    });
-  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,15 +254,38 @@ const LiveClass = () => {
           
           {/* Main Presenter / Screen Share */}
           <div className="flex-1 bg-[#111] rounded-xl md:rounded-2xl border border-white/5 overflow-hidden relative group">
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
-              <div className="text-center p-4">
-                <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
-                  <span className="text-3xl md:text-5xl">👨‍🏫</span>
+            {isHost ? (
+              localCameraTrack && !isVideoOff ? (
+                <div className="absolute inset-0">
+                  <VideoPlayer track={localCameraTrack} />
                 </div>
-                <h3 className="text-lg md:text-2xl font-bold text-white/80">Teacher's Screen</h3>
-                <p className="text-white/40 mt-1 md:mt-2 text-xs md:text-sm">System Design Architecture</p>
-              </div>
-            </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
+                  <div className="text-center p-4">
+                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+                      <span className="text-3xl md:text-5xl">👨‍🏫</span>
+                    </div>
+                    <h3 className="text-lg md:text-2xl font-bold text-white/80">Your Camera is Off</h3>
+                  </div>
+                </div>
+              )
+            ) : (
+              teacherRemoteUser && teacherRemoteUser.hasVideo ? (
+                <div className="absolute inset-0">
+                  <RemoteUser user={teacherRemoteUser} />
+                </div>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
+                  <div className="text-center p-4">
+                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+                      <span className="text-3xl md:text-5xl">👨‍🏫</span>
+                    </div>
+                    <h3 className="text-lg md:text-2xl font-bold text-white/80">Teacher's Screen</h3>
+                    <p className="text-white/40 mt-1 md:mt-2 text-xs md:text-sm">Camera is off or loading...</p>
+                  </div>
+                </div>
+              )
+            )}
 
             <div className="absolute bottom-3 left-3 md:bottom-4 md:left-4 bg-black/60 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-sm flex items-center gap-1.5 md:gap-2">
               <Mic size={12} className="text-green-400 md:w-3.5 md:h-3.5" />
@@ -285,16 +392,19 @@ const LiveClass = () => {
                       <div key={p.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold text-white/70">
-                            {p.name.charAt(0)}
+                            {p.avatar || p.name.charAt(0)}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-sm font-medium text-white/90">{p.name}</span>
+                            <span className="text-sm font-medium text-white/90">
+                              {p.name} {p.id === user?.id && '(You)'}
+                            </span>
                             <span className="text-[10px] text-white/40">{p.role}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 text-white/40">
-                          <Mic size={14} />
-                          <Video size={14} />
+                          {p.isHandRaised && <Hand size={14} className="text-yellow-500" fill="currentColor" />}
+                          {p.isMuted ? <MicOff size={14} className="text-red-400" /> : <Mic size={14} className="text-green-400" />}
+                          {p.isVideoOff ? <VideoOff size={14} className="text-red-400" /> : <Video size={14} className="text-green-400" />}
                         </div>
                       </div>
                     ))}
@@ -356,6 +466,16 @@ const LiveClass = () => {
           </div>
         </div>
     </div>
+  );
+};
+
+const LiveClass = () => {
+  const client = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: "rtc" }));
+  
+  return (
+    <AgoraRTCProvider client={client}>
+      <LiveClassRoom />
+    </AgoraRTCProvider>
   );
 };
 
