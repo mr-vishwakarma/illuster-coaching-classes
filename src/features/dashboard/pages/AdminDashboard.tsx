@@ -20,11 +20,16 @@ const AdminDashboard = () => {
   const students = mockUsers.filter(u => u.role === 'student');
 
   return (
-    <div style={{ paddingTop: '4.5rem', backgroundColor: 'var(--bg-main)', minHeight: '100vh', display: 'flex' }}>
-      
-      {/* Sidebar Admin Menu - Desktop */}
-      <div className="hidden lg:flex flex-col w-64 bg-[var(--bg-card)] border-r border-[var(--border-light)] fixed h-full z-20" style={{ top: '4.5rem', paddingTop: '2rem' }}>
-        <div className="px-6 mb-8">
+    <div className="bg-[var(--bg-main)] min-h-screen flex flex-col">
+      {/* Fixed Top Navbar */}
+      <div className="fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-6 lg:px-10 flex items-center">
+        <DashboardHeader />
+      </div>
+
+      <div className="flex flex-1 pt-[4.5rem]">
+        {/* Sidebar Admin Menu - Desktop */}
+        <div className="hidden lg:flex flex-col w-64 bg-[var(--bg-card)] border-r border-[var(--border-light)] fixed h-[calc(100vh-4.5rem)] z-20 overflow-y-auto pb-6" style={{ top: '4.5rem', paddingTop: '2rem' }}>
+          <div className="px-6 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary-dark text-white flex items-center justify-center font-bold">
               {user?.avatar}
@@ -67,8 +72,6 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 lg:ml-64 p-6 lg:p-10">
-        
-        <DashboardHeader />
 
         <div className="flex justify-between items-center mb-8">
           <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', margin: 0, color: 'var(--text-main)' }}>
@@ -327,6 +330,7 @@ const AdminDashboard = () => {
         )}
 
       </div>
+    </div>
     </div>
   );
 };

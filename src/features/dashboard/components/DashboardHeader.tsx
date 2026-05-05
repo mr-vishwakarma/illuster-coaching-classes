@@ -7,7 +7,7 @@ export const DashboardHeader = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="flex justify-between items-center mb-8 border-b border-[var(--border-light)] pb-6 bg-[var(--bg-card)]/50 backdrop-blur-sm sticky top-0 z-30 pt-4">
+    <div className="flex justify-between items-center w-full">
       <div className="flex items-center gap-6">
         <Link to="/" className="hover:opacity-80 transition-all hover:scale-105 active:scale-95">
           <img src="/logo.png" alt="Illuster" className="h-8 md:h-10 w-auto" />

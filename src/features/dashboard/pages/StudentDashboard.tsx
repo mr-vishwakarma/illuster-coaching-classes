@@ -35,11 +35,11 @@ const StudentDashboard = () => {
     <div className="pt-[140px] md:pt-[180px] bg-[var(--bg-main)] min-h-screen">
       
       {/* Dashboard Header */}
-      <div className="bg-[var(--bg-card)] text-[var(--text-main)] pt-10 pb-8 md:pb-14 border-b border-[var(--border-light)]">
+      <div className="bg-[var(--bg-card)] text-[var(--text-main)] pt-6 pb-8 md:pb-14 border-b border-[var(--border-light)]">
+        <div className="container mx-auto px-4 md:px-6 mb-8">
+          <DashboardHeader />
+        </div>
         <div className="container mx-auto px-4 md:px-6">
-      <div className="container mx-auto px-4 md:px-6 mb-4">
-        <DashboardHeader />
-      </div>
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[var(--text-main)] text-[var(--bg-card)] flex items-center justify-center font-display text-2xl md:text-3xl font-bold shadow-xl">
               {user?.avatar}
