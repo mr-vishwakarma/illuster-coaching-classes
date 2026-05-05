@@ -1,41 +1,29 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { create } from 'zustand';
 
 type Theme = 'light' | 'dark';
 
-interface ThemeContextType {
+interface ThemeStore {
   theme: Theme;
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    return savedTheme || 'light';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+const getInitialTheme = (): Theme => {
+  const savedTheme = (localStorage.getItem('theme') as Theme) || 'light';
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('data-theme', savedTheme);
   }
-  return context;
+  return savedTheme;
 };
+
+export const useTheme = create<ThemeStore>((set) => ({
+  theme: getInitialTheme(),
+  toggleTheme: () => set((state) => {
+    const newTheme = state.theme === 'light' ? 'dark' : 'light';
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+    return { theme: newTheme };
+  }),
+}));
 

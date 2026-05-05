@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
-import { AuthProvider } from '../shared/context/AuthContext';
-import { ThemeProvider } from '../shared/context/ThemeContext';
 import MouseFollower from '../shared/components/MouseFollower';
-import { TrafficProvider } from '../shared/context/TrafficContext';
 import AppLayout from './AppLayout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Initialize stores that have side effects
+import '../shared/context/AuthContext';
+import '../shared/context/TrafficContext';
 
 // ─── Scroll to top on route change ──────────────────────────────────────────
 const ScrollToTop = () => {
@@ -26,21 +27,15 @@ const ScrollToTop = () => {
   return null;
 };
 
-// ─── Root App: Providers + Router shell ──────────────────────────────────────
+// ─── Root App: Router shell ──────────────────────────────────────
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <TrafficProvider>
-          <Router>
-            <ScrollToTop />
-            <MouseFollower />
-            <AppLayout />
-            <ToastContainer position="top-right" autoClose={3000} theme="dark" />
-          </Router>
-        </TrafficProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <Router>
+      <ScrollToTop />
+      <MouseFollower />
+      <AppLayout />
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+    </Router>
   );
 }
 

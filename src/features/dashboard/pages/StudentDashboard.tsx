@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Book, PlayCircle, FileText, Calendar, Clock, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
@@ -15,14 +15,21 @@ const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const enrolledCourseData = courses.filter(c => user?.enrolledCourses.includes(c.id));
+  const enrolledCourseData = useMemo(() => 
+    courses.filter(c => user?.enrolledCourses?.includes(c.id)), 
+  [user?.enrolledCourses]);
   
   // Filter materials for enrolled courses
-  const myMaterials = studyMaterials.filter(m => user?.enrolledCourses.includes(m.courseId));
-  const recentMaterials = myMaterials.slice(0, 5);
+  const myMaterials = useMemo(() => 
+    studyMaterials.filter(m => user?.enrolledCourses?.includes(m.courseId)), 
+  [user?.enrolledCourses]);
+  
+  const recentMaterials = useMemo(() => myMaterials.slice(0, 5), [myMaterials]);
   
   // Filter upcoming classes for enrolled courses
-  const myClasses = upcomingClasses.filter(c => user?.enrolledCourses.includes(c.courseId));
+  const myClasses = useMemo(() => 
+    upcomingClasses.filter(c => user?.enrolledCourses?.includes(c.courseId)), 
+  [user?.enrolledCourses]);
 
   return (
     <div className="pt-[140px] md:pt-[180px] bg-[var(--bg-main)] min-h-screen">
@@ -205,18 +212,16 @@ const StudentDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'questies' && (
-          <div className="flex flex-col lg:flex-row gap-8">
-            <div className="lg:w-1/2">
-              <h2 className="text-xl md:text-2xl font-display font-black mb-6">Ask a New Doubt</h2>
-              <QuestieForm onSubmitted={() => setRefreshTrigger(prev => prev + 1)} />
-            </div>
-            <div className="lg:w-1/2">
-              <h2 className="text-xl md:text-2xl font-display font-black mb-6">Doubt History</h2>
-              <QuestieList refreshTrigger={refreshTrigger} />
-            </div>
+        <div className={`flex-col lg:flex-row gap-8 ${activeTab === 'questies' ? 'flex' : 'hidden'}`}>
+          <div className="lg:w-1/2">
+            <h2 className="text-xl md:text-2xl font-display font-black mb-6">Ask a New Doubt</h2>
+            <QuestieForm onSubmitted={() => setRefreshTrigger(prev => prev + 1)} />
           </div>
-        )}
+          <div className="lg:w-1/2">
+            <h2 className="text-xl md:text-2xl font-display font-black mb-6">Doubt History</h2>
+            <QuestieList refreshTrigger={refreshTrigger} />
+          </div>
+        </div>
 
         {activeTab === 'my-courses' && (
           <MyCourses />
