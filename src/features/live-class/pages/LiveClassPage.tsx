@@ -142,7 +142,7 @@ const LiveClass = () => {
   };
 
   return (
-    <div className="h-screen bg-[#0a0a0a] text-white flex flex-col font-sans pt-[72px]">
+    <div className="h-[100dvh] bg-[#0a0a0a] text-white flex flex-col font-sans overflow-hidden">
       
       {/* Header Info */}
       <div className="h-12 md:h-14 bg-[#111] border-b border-white/5 flex items-center justify-between px-3 md:px-6 shrink-0">
@@ -304,9 +304,10 @@ const LiveClass = () => {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
 
-        <div className="h-20 md:h-24 bg-[#111] border-t border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 relative z-20 w-full fixed bottom-0">
-          <div className="hidden md:flex items-center gap-4 w-1/4">
+      <div className="h-20 md:h-24 bg-[#111] border-t border-white/5 flex items-center justify-between px-4 md:px-8 shrink-0 relative z-30 w-full">
+        <div className="hidden md:flex items-center gap-4 w-1/4">
             <span className="text-sm font-black text-white/50 uppercase tracking-widest">System Design | 10:02 AM</span>
           </div>
 
@@ -354,7 +355,6 @@ const LiveClass = () => {
             </button>
           </div>
         </div>
-      </div>
     </div>
   );
 };
