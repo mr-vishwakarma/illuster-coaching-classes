@@ -327,19 +327,25 @@ const LiveClassRoom = () => {
                 </div>
               )
             ) : (
-              teacherVideoTrack ? (
-                <div className="absolute inset-0" ref={remoteVideoRef} />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
-                  <div className="text-center p-4">
-                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
-                      <span className="text-3xl md:text-5xl">👨‍🏫</span>
+              <>
+                {/* Always mounted so ref is always attached — visibility toggled via CSS */}
+                <div
+                  ref={remoteVideoRef}
+                  className="absolute inset-0"
+                  style={{ display: teacherVideoTrack ? 'block' : 'none' }}
+                />
+                {!teacherVideoTrack && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
+                    <div className="text-center p-4">
+                      <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+                        <span className="text-3xl md:text-5xl">👨‍🏫</span>
+                      </div>
+                      <h3 className="text-lg md:text-2xl font-bold text-white/80">Waiting for teacher...</h3>
+                      <p className="text-white/40 mt-1 md:mt-2 text-xs md:text-sm">Camera or screen share will appear here</p>
                     </div>
-                    <h3 className="text-lg md:text-2xl font-bold text-white/80">Waiting for teacher...</h3>
-                    <p className="text-white/40 mt-1 md:mt-2 text-xs md:text-sm">Camera or screen share will appear here</p>
                   </div>
-                </div>
-              )
+                )}
+              </>
             )}
 
             <div className="absolute bottom-3 left-3 md:bottom-4 md:left-4 bg-black/60 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-sm flex items-center gap-1.5 md:gap-2">
