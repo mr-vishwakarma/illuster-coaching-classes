@@ -131,7 +131,7 @@ const LiveClassRoom = () => {
   }, [audioTracks]);
 
   // Identify Teacher
-  const isHost = user?.role === 'admin' || user?.role === 'tutor';
+  const isHost = ['admin', 'tutor'].includes(user?.role?.toLowerCase() || '');
   const teacherRemoteUser = remoteUsers.find(u => {
     const p = participants.find(part => part.id === u.uid);
     return p?.role === 'Host';
@@ -172,7 +172,7 @@ const LiveClassRoom = () => {
         
         setParticipants(prevParticipants => {
           // Show notification if someone raised their hand
-          if (user.role !== 'student') {
+          if (['admin', 'tutor'].includes(user?.role?.toLowerCase() || '')) {
             activeParticipants.forEach(p => {
               const existingP = prevParticipants.find(ep => ep.id === p.id);
               if (p.isHandRaised && (!existingP || !existingP.isHandRaised)) {
@@ -188,7 +188,7 @@ const LiveClassRoom = () => {
           await presenceChannel.track({
             id: user.id,
             name: user.name,
-            role: user.role === 'student' ? 'Student' : 'Host',
+            role: ['admin', 'tutor'].includes(user?.role?.toLowerCase() || '') ? 'Host' : 'Student',
             isMuted,
             isVideoOff,
             isHandRaised,
@@ -247,7 +247,7 @@ const LiveClassRoom = () => {
       user_id: user.id,
       user_name: user.name,
       message: chatMessage,
-      is_teacher: user.role === 'admin' || user.role === 'tutor'
+      is_teacher: ['admin', 'tutor'].includes(user?.role?.toLowerCase() || '')
     };
 
     const { error } = await supabase.from('live_messages').insert(newMessage);
