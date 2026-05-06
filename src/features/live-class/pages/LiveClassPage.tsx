@@ -20,7 +20,7 @@ import AgoraRTC, {
   usePublish,
   useRemoteUsers,
   useRemoteAudioTracks,
-  RemoteUser
+  useRemoteVideoTracks,
 } from "agora-rtc-react";
 
 const VideoPlayer = ({ track, isScreenShare = false }: { track: any, isScreenShare?: boolean }) => {
@@ -125,17 +125,30 @@ const LiveClassRoom = () => {
 
   const remoteUsers = useRemoteUsers();
   const { audioTracks } = useRemoteAudioTracks(remoteUsers);
+  const { videoTracks: remoteVideoTracks } = useRemoteVideoTracks(remoteUsers);
+
+  // The first remote video track is always the teacher's feed (camera or screen share)
+  const teacherVideoTrack = remoteVideoTracks[0] ?? null;
+
+  // Identify Host before any effects that depend on it
+  const isHost = ['admin', 'tutor'].includes(user?.role?.toLowerCase() || '');
 
   useEffect(() => {
     audioTracks.forEach(track => track.play());
   }, [audioTracks]);
 
-  // Identify Teacher
-  const isHost = ['admin', 'tutor'].includes(user?.role?.toLowerCase() || '');
-  const teacherRemoteUser = remoteUsers.find(u => {
-    const p = participants.find(part => part.id === u.uid);
-    return p?.role === 'Host';
-  });
+  // Play remote video track (camera or screen share) in the student view
+  const remoteVideoRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isHost && teacherVideoTrack && remoteVideoRef.current) {
+      const isScreen = teacherVideoTrack.getMediaStreamTrack?.()?.label?.toLowerCase().includes('screen') ||
+                       teacherVideoTrack.getMediaStreamTrack?.()?.label?.toLowerCase().includes('display');
+      teacherVideoTrack.play(remoteVideoRef.current, { fit: isScreen ? 'contain' : 'cover' });
+    }
+    return () => {
+      if (!isHost && teacherVideoTrack) teacherVideoTrack.stop();
+    };
+  }, [teacherVideoTrack, isHost]);
   // -------------------
 
   useEffect(() => {
@@ -314,18 +327,16 @@ const LiveClassRoom = () => {
                 </div>
               )
             ) : (
-              teacherRemoteUser && teacherRemoteUser.hasVideo ? (
-                <div className="absolute inset-0">
-                  <RemoteUser user={teacherRemoteUser} />
-                </div>
+              teacherVideoTrack ? (
+                <div className="absolute inset-0" ref={remoteVideoRef} />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
                   <div className="text-center p-4">
                     <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
                       <span className="text-3xl md:text-5xl">👨‍🏫</span>
                     </div>
-                    <h3 className="text-lg md:text-2xl font-bold text-white/80">Teacher's Screen</h3>
-                    <p className="text-white/40 mt-1 md:mt-2 text-xs md:text-sm">Camera is off or loading...</p>
+                    <h3 className="text-lg md:text-2xl font-bold text-white/80">Waiting for teacher...</h3>
+                    <p className="text-white/40 mt-1 md:mt-2 text-xs md:text-sm">Camera or screen share will appear here</p>
                   </div>
                 </div>
               )
