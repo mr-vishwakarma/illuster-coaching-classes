@@ -9,7 +9,7 @@ import AppRoutes from './routes';
 const AppLayout = () => {
   const { pathname } = useLocation();
   
-  const isLiveClass = pathname === '/live-class';
+  const isLiveClass = pathname.startsWith('/live-class');
   const isLogin = pathname === '/login';
   const isRequestCallback = pathname === '/request-callback';
   const isDashboard = pathname.startsWith('/dashboard');

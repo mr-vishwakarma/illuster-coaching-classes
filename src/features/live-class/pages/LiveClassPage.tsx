@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mic, MicOff, Video, VideoOff, MonitorUp, 
@@ -6,7 +6,7 @@ import {
   PhoneOff, Send, Maximize,
   X
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../../shared/lib/supabase';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { toast } from 'react-toastify';
@@ -23,23 +23,24 @@ import AgoraRTC, {
   RemoteUser
 } from "agora-rtc-react";
 
-const VideoPlayer = ({ track }: { track: any }) => {
+const VideoPlayer = ({ track, isScreenShare = false }: { track: any, isScreenShare?: boolean }) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (track && ref.current) {
-      track.play(ref.current);
+      track.play(ref.current, { fit: isScreenShare ? "contain" : "cover" });
     }
     return () => {
       if (track) {
         track.stop();
       }
     };
-  }, [track]);
-  return <div ref={ref} className="w-full h-full [&>div>video]:object-cover" />;
+  }, [track, isScreenShare]);
+  return <div ref={ref} className={`w-full h-full [&>div>video]:${isScreenShare ? '!object-contain' : '!object-cover'}`} />;
 };
 
 const LiveClassRoom = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [activeTab, setActiveTab] = useState<'chat' | 'participants'>('chat');
@@ -52,14 +53,46 @@ const LiveClassRoom = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [participants, setParticipants] = useState<any[]>([]);
   const [roomChannel, setRoomChannel] = useState<RealtimeChannel | null>(null);
-  const sessionId = "batch-a-sys-design"; 
-
+  const { sessionId = "default-room" } = useParams();
+  
   // --- Agora Setup ---
   const appId = import.meta.env.VITE_AGORA_APP_ID || "test-app-id";
-  const [isJoined, setIsJoined] = useState(true);
+  const isJoined = true;
   
-  const { isLoading: isMicLoading, localMicrophoneTrack } = useLocalMicrophoneTrack(isJoined);
-  const { isLoading: isCamLoading, localCameraTrack } = useLocalCameraTrack(isJoined);
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(isJoined);
+  const { localCameraTrack } = useLocalCameraTrack(isJoined);
+
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [screenTrack, setScreenTrack] = useState<any>(null);
+
+  const toggleScreenShare = async () => {
+    if (isScreenSharing && screenTrack) {
+      screenTrack.close();
+      setScreenTrack(null);
+      setIsScreenSharing(false);
+    } else {
+      try {
+        const track = await AgoraRTC.createScreenVideoTrack({
+          encoderConfig: "1080p_1",
+          optimizationMode: "detail"
+        }, "auto");
+        
+        const videoTrack = Array.isArray(track) ? track[0] : track;
+        
+        videoTrack.on("track-ended", () => {
+          videoTrack.close();
+          setScreenTrack(null);
+          setIsScreenSharing(false);
+        });
+        
+        setScreenTrack(videoTrack);
+        setIsScreenSharing(true);
+      } catch (error) {
+        console.error("Failed to start screen share", error);
+        toast.error("Could not share screen");
+      }
+    }
+  };
   
   // Set enabled states based on UI toggles without destroying tracks
   useEffect(() => {
@@ -70,7 +103,18 @@ const LiveClassRoom = () => {
     if (localCameraTrack) localCameraTrack.setEnabled(!isVideoOff);
   }, [isVideoOff, localCameraTrack]);
 
-  usePublish([localMicrophoneTrack, localCameraTrack]);
+  const tracksToPublish = useMemo(() => {
+    const tracks = [];
+    if (localMicrophoneTrack) tracks.push(localMicrophoneTrack);
+    if (screenTrack) {
+      tracks.push(screenTrack);
+    } else if (localCameraTrack) {
+      tracks.push(localCameraTrack);
+    }
+    return tracks;
+  }, [localMicrophoneTrack, localCameraTrack, screenTrack]);
+
+  usePublish(tracksToPublish);
 
   useJoin({
     appid: appId,
@@ -255,9 +299,9 @@ const LiveClassRoom = () => {
           {/* Main Presenter / Screen Share */}
           <div className="flex-1 bg-[#111] rounded-xl md:rounded-2xl border border-white/5 overflow-hidden relative group">
             {isHost ? (
-              localCameraTrack && !isVideoOff ? (
+              (isScreenSharing && screenTrack) || (localCameraTrack && !isVideoOff) ? (
                 <div className="absolute inset-0">
-                  <VideoPlayer track={localCameraTrack} />
+                  <VideoPlayer track={isScreenSharing ? screenTrack : localCameraTrack} isScreenShare={isScreenSharing} />
                 </div>
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a251a] to-[#0a0f0a]">
@@ -436,7 +480,10 @@ const LiveClassRoom = () => {
               {isVideoOff ? <VideoOff size={18} /> : <Video size={18} />}
             </button>
             
-            <button className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-all hidden sm:flex">
+            <button 
+              onClick={toggleScreenShare}
+              className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all hidden sm:flex ${isScreenSharing ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)] scale-110' : 'bg-white/5 hover:bg-white/10 text-white'}`}
+            >
               <MonitorUp size={18} />
             </button>
             
@@ -447,10 +494,24 @@ const LiveClassRoom = () => {
               <Hand size={18} fill={isHandRaised ? "currentColor" : "none"} />
             </button>
 
-            <Link to="/dashboard" className="px-4 md:px-6 h-10 md:h-12 rounded-xl bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 font-black text-[10px] md:text-sm uppercase tracking-widest ml-2 transition-all">
-              <PhoneOff size={14} className="md:w-[18px] md:h-[18px]" />
+            <Link to="/dashboard" className="px-4 md:px-6 h-10 md:h-12 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center gap-2 font-black text-[10px] md:text-sm uppercase tracking-widest ml-2 transition-all">
               <span className="hidden xs:inline">Leave</span>
             </Link>
+
+            {isHost && (
+              <button 
+                onClick={async () => {
+                  if(window.confirm("Are you sure you want to completely end this class? This will close it for all students.")) {
+                    await supabase.from('live_sessions').update({ status: 'ended' }).eq('id', sessionId);
+                    navigate('/dashboard');
+                  }
+                }}
+                className="px-4 md:px-6 h-10 md:h-12 rounded-xl bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2 font-black text-[10px] md:text-sm uppercase tracking-widest ml-2 transition-all"
+              >
+                <PhoneOff size={14} className="md:w-[18px] md:h-[18px]" />
+                <span className="hidden xs:inline">End Class</span>
+              </button>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-2 md:gap-3 w-1/4">

@@ -1,13 +1,22 @@
 import { useState } from 'react';
-import { Users, BookOpen, AlertCircle, Video, PlayCircle, HelpCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Users, BookOpen, AlertCircle, Video, PlayCircle, HelpCircle, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
 import { DashboardHeader } from '../components/DashboardHeader';
+import { supabase } from '../../../shared/lib/supabase';
+import { toast } from 'react-toastify';
 
 const TutorDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Live Class Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [batch, setBatch] = useState('Batch A - AI Cohort');
+  const [isCreating, setIsCreating] = useState(false);
 
   return (
     <div className="bg-[var(--bg-main)] min-h-screen flex flex-col">
@@ -85,10 +94,10 @@ const TutorDashboard = () => {
               <h3 className="font-bold mb-4 flex items-center gap-2 text-[var(--text-muted)] opacity-60 uppercase text-[10px] tracking-widest">
                 <Video size={14} /> Quick Link
               </h3>
-              <Link to="/live-class" className="flex items-center justify-between p-4 bg-[var(--bg-main)] rounded-xl hover:bg-[var(--primary-light)] transition-all border border-[var(--border-light)]">
+              <button onClick={() => setIsModalOpen(true)} className="w-full flex items-center justify-between p-4 bg-[var(--bg-main)] rounded-xl hover:bg-[var(--primary-light)] transition-all border border-[var(--border-light)]">
                 <div className="font-bold text-[var(--text-main)] text-sm">Start Teaching (Live)</div>
                 <PlayCircle className="text-red-600" />
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -112,6 +121,92 @@ const TutorDashboard = () => {
         )}
 
       </div>
+      {/* Create Live Session Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-[var(--bg-card)] border border-[var(--border-light)] rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-main)]"
+            >
+              <X size={20} />
+            </button>
+            <h2 className="text-xl font-display font-black mb-6 text-[var(--text-main)]">Start a Live Class</h2>
+            
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setIsCreating(true);
+              
+              // Check if already active
+              const { data: existingActive } = await supabase
+                .from('live_sessions')
+                .select('id')
+                .eq('tutor_id', user?.id)
+                .eq('status', 'live')
+                .maybeSingle();
+                
+              if (existingActive) {
+                toast.info("You already have an active class. Resuming it instead!");
+                setIsCreating(false);
+                navigate(`/live-class/${existingActive.id}`);
+                return;
+              }
+              
+              const { data, error } = await supabase
+                .from('live_sessions')
+                .insert({
+                  title,
+                  batch,
+                  tutor_id: user?.id,
+                  status: 'live'
+                })
+                .select()
+                .single();
+                
+              setIsCreating(false);
+              
+              if (error) {
+                toast.error("Failed to start session.");
+                console.error(error);
+              } else {
+                toast.success("Class is live!");
+                navigate(`/live-class/${data.id}`);
+              }
+            }} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-2">Class Topic</label>
+                <input 
+                  required
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  placeholder="e.g., System Design Architecture" 
+                  className="w-full bg-[var(--bg-main)] border border-[var(--border-light)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[var(--primary)] text-[var(--text-main)]" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-2">Select Batch</label>
+                <select 
+                  value={batch}
+                  onChange={e => setBatch(e.target.value)}
+                  className="w-full bg-[var(--bg-main)] border border-[var(--border-light)] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[var(--primary)] text-[var(--text-main)]"
+                >
+                  <option value="Batch A - AI Cohort">Batch A - AI Cohort</option>
+                  <option value="Batch B - Frontend Masters">Batch B - Frontend Masters</option>
+                  <option value="All Students">All Students</option>
+                </select>
+              </div>
+              <button 
+                type="submit" 
+                disabled={isCreating}
+                className="btn btn-primary w-full mt-4 flex justify-center items-center gap-2"
+              >
+                {isCreating ? 'Creating...' : <><Video size={18} /> Go Live Now</>}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
     </div>
   );

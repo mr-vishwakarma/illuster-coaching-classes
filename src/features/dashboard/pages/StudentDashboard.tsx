@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Book, PlayCircle, FileText, Calendar, Clock, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
@@ -9,11 +9,35 @@ import { QuestieList } from '../../questies/components/QuestieList';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { MyCourses } from '../components/MyCourses';
 import { HelpCircle } from 'lucide-react';
+import { supabase } from '../../../shared/lib/supabase';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [liveSessions, setLiveSessions] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchLiveSessions = async () => {
+      const { data } = await supabase
+        .from('live_sessions')
+        .select(`
+          id, title, batch, tutor_id, profiles:tutor_id(full_name)
+        `)
+        .eq('status', 'live');
+      if (data) setLiveSessions(data);
+    };
+
+    fetchLiveSessions();
+
+    const channel = supabase.channel('live_sessions_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_sessions' }, fetchLiveSessions)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const enrolledCourseData = useMemo(() => 
     courses.filter(c => user?.enrolledCourses?.includes(c.id)), 
@@ -41,6 +65,23 @@ const StudentDashboard = () => {
       </div>
 
       <div className="flex-1 pt-[4.5rem]">
+        {/* Live Class Banner */}
+        {liveSessions.map(session => (
+          <div key={session.id} className="bg-red-600 text-white px-4 md:px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-3 shadow-lg z-40 relative">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <span className="bg-white text-red-600 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest flex items-center gap-1 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></div> LIVE NOW
+              </span>
+              <span className="font-bold text-sm md:text-base truncate">
+                {session.profiles?.full_name || 'Tutor'} is hosting: {session.title} ({session.batch})
+              </span>
+            </div>
+            <Link to={`/live-class/${session.id}`} className="w-full md:w-auto shrink-0 bg-black/20 hover:bg-black/40 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+              <Video size={14} /> Join Class
+            </Link>
+          </div>
+        ))}
+
         {/* Welcome Section */}
         <div className="bg-[var(--bg-card)] text-[var(--text-main)] py-8 md:py-12 border-b border-[var(--border-light)]">
           <div className="container mx-auto px-4 md:px-6">

@@ -40,7 +40,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/live-class"
+          path="/live-class/:sessionId"
           element={
             <ProtectedRoute>
               <LiveClassPage />
