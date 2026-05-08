@@ -16,6 +16,7 @@
     "@gsap/react": "^2.1.2",
     "@supabase/supabase-js": "^2.105.1",
     "@tailwindcss/vite": "^4.2.4",
+    "@vercel/speed-insights": "^2.0.0",
     "agora-rtc-react": "^2.5.1",
     "agora-rtc-sdk-ng": "^4.24.3",
     "framer-motion": "^12.38.0",

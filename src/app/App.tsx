@@ -4,6 +4,7 @@ import MouseFollower from '../shared/components/MouseFollower';
 import AppLayout from './AppLayout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Initialize stores that have side effects
 import '../shared/context/AuthContext';
@@ -35,6 +36,7 @@ function App() {
       <MouseFollower />
       <AppLayout />
       <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+      <SpeedInsights />
     </Router>
   );
 }
