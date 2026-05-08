@@ -79,7 +79,33 @@ const LiveClassRoom = () => {
   
   // --- Agora Setup ---
   const appId = import.meta.env.VITE_AGORA_APP_ID || "test-app-id";
-  const isJoined = true;
+
+  // Fetch a short-lived Agora token from the Edge Function before joining
+  // Falls back to null (testing mode) if Edge Function is not deployed
+  const [agoraToken, setAgoraToken] = useState<string | null>(null);
+  const [isJoined, setIsJoined] = useState(false);
+
+  useEffect(() => {
+    if (!user?.id || !sessionId) return;
+    const fetchToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('agora-token', {
+          body: { channelName: sessionId, uid: user.id }
+        });
+        if (!error && data?.token) {
+          setAgoraToken(data.token);
+        } else {
+          // Edge function not deployed yet — safe fallback to testing mode
+          setAgoraToken(null);
+        }
+      } catch {
+        setAgoraToken(null);
+      } finally {
+        setIsJoined(true); // Join regardless — token is optional in testing mode
+      }
+    };
+    fetchToken();
+  }, [user?.id, sessionId]);
   
   const { localMicrophoneTrack } = useLocalMicrophoneTrack(isJoined);
   const { localCameraTrack } = useLocalCameraTrack(isJoined);
@@ -141,7 +167,7 @@ const LiveClassRoom = () => {
   useJoin({
     appid: appId,
     channel: sessionId,
-    token: null,
+    token: agoraToken,
     uid: user?.id
   }, isJoined);
 
