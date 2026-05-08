@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { Users, BookOpen, IndianRupee, AlertCircle, Plus, Edit, ArrowUpRight, ArrowDownRight, Video, PlayCircle, Database } from 'lucide-react';
+import {
+  Users, BookOpen, IndianRupee, AlertCircle, Plus,
+  Edit, ArrowUpRight, ArrowDownRight, PlayCircle,
+  Database, HelpCircle, BarChart3, ChevronRight, Radio, Shield
+} from 'lucide-react';
+
 import { Link } from 'react-router-dom';
 import { adminStats } from '../';
 import { CourseManager } from '../components/CourseManager';
@@ -11,329 +16,337 @@ import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { DatabaseHealth } from '../components/DatabaseHealth';
-import { HelpCircle } from 'lucide-react';
+import MobileBottomNav from '../components/MobileBottomNav';
 
+// ─── Stat Card ────────────────────────────────────────────────
+const StatCard = ({
+  label, value, change, positive, icon, color
+}: {
+  label: string; value: string | number; change: string;
+  positive: boolean; icon: React.ReactNode; color: string;
+}) => (
+  <div className="card p-5 flex flex-col gap-3">
+    <div className="flex items-center justify-between">
+      <span className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{label}</span>
+      <div className="p-2 rounded-lg" style={{ background: `${color}18` }}>
+        <div style={{ color }}>{icon}</div>
+      </div>
+    </div>
+    <div className="text-2xl font-display font-black text-[var(--text-main)]">{value}</div>
+    <div className={`flex items-center gap-1 text-xs font-semibold ${positive ? 'text-green-500' : 'text-red-400'}`}>
+      {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+      {change}
+    </div>
+  </div>
+);
+
+// ─── Section Header ───────────────────────────────────────────
+const SectionHeader = ({ title, sub }: { title: string; sub?: string }) => (
+  <div className="mb-5">
+    <h2 className="text-xl md:text-2xl font-display font-black text-[var(--text-main)]">{title}</h2>
+    {sub && <p className="text-sm text-[var(--text-muted)] mt-0.5">{sub}</p>}
+  </div>
+);
+
+// ─── Main Component ───────────────────────────────────────────
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-
   const students = mockUsers.filter(u => u.role === 'student');
+
+  const navItems = [
+    { id: 'overview',  icon: <BarChart3 size={18} />,    label: 'Overview' },
+    { id: 'live',      icon: <Radio size={18} />,         label: 'Live' },
+    { id: 'students',  icon: <Users size={18} />,         label: 'Students' },
+    { id: 'courses',   icon: <BookOpen size={18} />,      label: 'Courses' },
+    { id: 'questies',  icon: <HelpCircle size={18} />,    label: 'Doubts' },
+    { id: 'finance',   icon: <IndianRupee size={18} />,   label: 'Finance' },
+    { id: 'health',    icon: <Database size={18} />,      label: 'Health' },
+  ];
+
+  // Map adminStats to stat cards (inject icons + colors)
+  const statColors = ['#8a76ff', '#10b981', '#f59e0b', '#ef4444'];
+  const statIcons = [<Users size={18} />, <BookOpen size={18} />, <IndianRupee size={18} />, <AlertCircle size={18} />];
 
   return (
     <div className="bg-[var(--bg-main)] min-h-screen flex flex-col">
-      {/* Fixed Top Navbar */}
+
+      {/* Fixed Navbar */}
       <div className="fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-6 lg:px-10 flex items-center">
         <DashboardHeader />
       </div>
 
       <div className="flex flex-1 pt-[4.5rem]">
-        {/* Sidebar Admin Menu - Desktop */}
-        <div className="hidden lg:flex flex-col w-64 bg-[var(--bg-card)] border-r border-[var(--border-light)] fixed h-[calc(100vh-4.5rem)] z-20 overflow-y-auto pb-6" style={{ top: '4.5rem', paddingTop: '2rem' }}>
-          <div className="px-6 mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-dark text-white flex items-center justify-center font-bold">
-              {user?.avatar}
-            </div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{user?.name}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Administrator</div>
-            </div>
-          </div>
-        </div>
 
-        <nav className="flex flex-col gap-2 px-4">
-          {[
-            { id: 'overview', icon: <BookOpen size={20} />, label: 'Overview' },
-            { id: 'live', icon: <Video size={20} />, label: 'Live Classes' },
-            { id: 'students', icon: <Users size={20} />, label: 'Student Management' },
-            { id: 'courses', icon: <BookOpen size={20} />, label: 'Course Catalog' },
-            { id: 'questies', icon: <HelpCircle size={20} />, label: 'Doubt Portal' },
-            { id: 'finance', icon: <IndianRupee size={20} />, label: 'Finance & Fees' },
-            { id: 'health', icon: <Database size={20} />, label: 'System Health' }
-          ].map(item => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className="flex items-center gap-3 w-full text-left"
-              style={{
-                padding: '0.75rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: activeTab === item.id ? 'var(--primary-light)' : 'transparent',
-                color: activeTab === item.id ? 'var(--primary)' : 'var(--text-muted)',
-                fontWeight: activeTab === item.id ? 600 : 500,
-                transition: 'all 0.2s'
-              }}
-            >
-              {item.icon} {item.label}
-            </button>
-          ))}
-        </nav>
-      </div>
+        {/* Sidebar — Desktop Only */}
+        <div className="hidden lg:flex flex-col w-64 bg-[var(--bg-card)] border-r border-[var(--border-light)] fixed h-[calc(100vh-4.5rem)] z-20 overflow-y-auto pb-6" style={{ top: '4.5rem' }}>
 
-      {/* Main Content */}
-      <div className="flex-1 lg:ml-64 p-6 lg:p-10">
-
-        <div className="flex justify-between items-center mb-8">
-          <h1 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', margin: 0, color: 'var(--text-main)' }}>
-            Admin Dashboard
-          </h1>
-          <div className="flex gap-3">
-            <button className="btn btn-secondary flex items-center gap-2">
-              <AlertCircle size={18} /> Notifications
-            </button>
-            <button className="btn btn-primary flex items-center gap-2">
-              <Plus size={18} /> Add New
-            </button>
-          </div>
-        </div>
-
-        {activeTab === 'overview' && (
-          <>
-            {/* Stats Grid */}
-            <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-              {adminStats.map((stat, idx) => (
-                <div key={idx} className="card" style={{ padding: '1.5rem' }}>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-                    {stat.label}
-                  </div>
-                  <div style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                    {stat.value}
-                  </div>
-                  <div className="flex items-center gap-1" style={{ fontSize: '0.875rem', color: stat.positive ? 'var(--secondary)' : 'var(--accent-red)', fontWeight: 500 }}>
-                    {stat.positive ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                    {stat.change}
-                  </div>
+          {/* Admin Profile */}
+          <div className="px-5 py-6 border-b border-[var(--border-light)]">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white flex items-center justify-center font-bold text-lg shadow-lg">
+                {user?.avatar}
+              </div>
+              <div>
+                <div className="font-bold text-sm text-[var(--text-main)] truncate max-w-[130px]">{user?.name}</div>
+                <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest font-bold flex items-center gap-1">
+                  <Shield size={10} className="text-[var(--primary)]" /> Administrator
                 </div>
-              ))}
+              </div>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-6 mb-8">
-              <div className="flex justify-between items-end mb-2">
+          {/* Nav Items */}
+          <nav className="flex flex-col gap-1 px-3 pt-4">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  activeTab === item.id
+                    ? 'bg-[var(--primary-light)] text-[var(--primary)]'
+                    : 'text-[var(--text-muted)] hover:bg-[var(--bg-main)] hover:text-[var(--text-main)]'
+                }`}
+              >
+                <span className="flex items-center gap-3">{item.icon}{item.label}</span>
+                {activeTab === item.id && <ChevronRight size={14} />}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 lg:ml-64 p-5 lg:p-8 pb-24 lg:pb-8">
+
+          {/* ── OVERVIEW TAB ── */}
+          {activeTab === 'overview' && (
+            <div className="flex flex-col gap-6">
+
+              {/* Page Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl font-display font-black text-[var(--text-main)]">Pending Approvals</h2>
-                  <p className="text-sm text-[var(--text-muted)]">Review and verify new enrollment requests.</p>
+                  <h1 className="text-2xl lg:text-3xl font-display font-black text-[var(--text-main)]">Admin Dashboard</h1>
+                  <p className="text-sm text-[var(--text-muted)] mt-1">Platform-wide management and insights.</p>
                 </div>
-              </div>
-              <EnrollmentManager />
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-8">
-              
-              {/* Recent Enrollments */}
-              <div className="lg:col-span-2 card">
-                <div className="flex justify-between items-center p-6 border-b border-[var(--border-light)]">
-                  <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', margin: 0 }}>Recent Student Enrollments</h3>
-                  <button className="text-primary text-sm font-semibold hover:underline">View All</button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left" style={{ minWidth: '600px' }}>
-                    <thead style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-muted)', fontSize: '0.875rem', textTransform: 'uppercase' }}>
-                      <tr>
-                        <th className="py-3 px-6 font-semibold">Student Name</th>
-                        <th className="py-3 px-6 font-semibold">Contact</th>
-                        <th className="py-3 px-6 font-semibold">Join Date</th>
-                        <th className="py-3 px-6 font-semibold">Courses</th>
-                        <th className="py-3 px-6 font-semibold text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {students.map((student, idx) => (
-                        <tr key={student.id} style={{ borderBottom: idx !== students.length - 1 ? '1px solid var(--border-light)' : 'none' }}>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-primary-light text-primary flex justify-center items-center font-bold text-xs">
-                                {student.avatar}
-                              </div>
-                              <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{student.name}</span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6 text-sm color-muted">{student.phone || student.email}</td>
-                          <td className="py-4 px-6 text-sm">{student.joinDate}</td>
-                          <td className="py-4 px-6">
-                            <span className="badge" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
-                              {student.enrolledCourses.length} Enrolled
-                            </span>
-                          </td>
-                          <td className="py-4 px-6 text-right">
-                            <button style={{ color: 'var(--text-muted)', padding: '0.25rem' }} className="hover:text-primary">
-                              <Edit size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="flex gap-2 self-start sm:self-auto">
+                  <button className="btn btn-secondary flex items-center gap-2 text-sm">
+                    <AlertCircle size={16} /> Notify All
+                  </button>
+                  <button className="btn btn-primary flex items-center gap-2 text-sm" onClick={() => setActiveTab('students')}>
+                    <Plus size={16} /> Add Student
+                  </button>
                 </div>
               </div>
 
-              {/* Quick Actions / Active Courses */}
-              <div className="card h-max">
-                <div className="p-6 border-b border-light">
-                  <h3 style={{ fontSize: '1.25rem', fontFamily: 'var(--font-display)', margin: 0 }}>Active Batches</h3>
-                </div>
-                <div className="p-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="p-4 bg-gray-50 rounded-2xl">
-                      <div className="flex justify-between text-xs font-black uppercase tracking-widest text-gray-400 mb-1">
-                        <span>Batch A</span>
-                        <span>45 Students</span>
-                      </div>
-                      <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary w-[75%] rounded-full"></div>
-                      </div>
-                    </div>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                {adminStats.map((stat, idx) => (
+                  <StatCard
+                    key={idx}
+                    label={stat.label}
+                    value={stat.value}
+                    change={stat.change}
+                    positive={stat.positive}
+                    icon={statIcons[idx % 4]}
+                    color={statColors[idx % 4]}
+                  />
+                ))}
+              </div>
+
+              {/* Pending Approvals */}
+              <div>
+                <SectionHeader title="Pending Approvals" sub="Review and verify new enrollment requests." />
+                <EnrollmentManager />
+              </div>
+
+              {/* Recent Enrollments + Batches */}
+              <div className="grid lg:grid-cols-3 gap-6">
+
+                {/* Student Table */}
+                <div className="lg:col-span-2 card overflow-hidden">
+                  <div className="flex justify-between items-center p-5 border-b border-[var(--border-light)]">
+                    <h3 className="text-base font-display font-black text-[var(--text-main)]">Recent Enrollments</h3>
+                    <button onClick={() => setActiveTab('students')} className="text-[var(--primary)] text-xs font-black uppercase tracking-widest hover:underline flex items-center gap-1">
+                      View All <ChevronRight size={12} />
+                    </button>
                   </div>
-                  
-                  <button className="btn btn-outline w-full mt-6" onClick={() => setActiveTab('courses')}>
+                  {/* Scrollable on mobile */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left" style={{ minWidth: '540px' }}>
+                      <thead className="bg-[var(--bg-main)] text-[var(--text-muted)] text-xs uppercase tracking-widest">
+                        <tr>
+                          <th className="py-3 px-5 font-semibold">Student</th>
+                          <th className="py-3 px-5 font-semibold">Contact</th>
+                          <th className="py-3 px-5 font-semibold">Courses</th>
+                          <th className="py-3 px-5 font-semibold text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--border-light)]">
+                        {students.slice(0, 5).map(student => (
+                          <tr key={student.id} className="hover:bg-[var(--bg-main)] transition-colors">
+                            <td className="py-3 px-5">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex justify-center items-center font-bold text-xs shrink-0">
+                                  {student.avatar}
+                                </div>
+                                <span className="font-semibold text-sm text-[var(--text-main)]">{student.name}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-5 text-xs text-[var(--text-muted)]">{student.phone || student.email}</td>
+                            <td className="py-3 px-5">
+                              <span className="text-[10px] font-black uppercase tracking-widest bg-[var(--primary-light)] text-[var(--primary)] px-2 py-1 rounded-lg">
+                                {student.enrolledCourses.length} Enrolled
+                              </span>
+                            </td>
+                            <td className="py-3 px-5 text-right">
+                              <button className="p-1.5 text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors rounded-lg hover:bg-[var(--primary-light)]">
+                                <Edit size={15} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Active Batches */}
+                <div className="card p-5 h-max">
+                  <h3 className="text-base font-display font-black text-[var(--text-main)] mb-4">Active Batches</h3>
+                  <div className="flex flex-col gap-3">
+                    {[
+                      { name: 'Batch A — JEE Elite', students: 45, progress: 75 },
+                      { name: 'Batch B — NEET Pro', students: 38, progress: 60 },
+                      { name: 'Batch C — Board Prep', students: 22, progress: 40 },
+                    ].map(batch => (
+                      <div key={batch.name} className="p-3 bg-[var(--bg-main)] rounded-xl border border-[var(--border-light)]">
+                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">
+                          <span>{batch.name}</span>
+                          <span>{batch.students} Students</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-[var(--border-light)] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[var(--primary)] rounded-full transition-all"
+                            style={{ width: `${batch.progress}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    className="btn btn-outline w-full mt-4 text-xs"
+                    onClick={() => setActiveTab('courses')}
+                  >
                     Manage Courses
                   </button>
                 </div>
+
               </div>
-
             </div>
-          </>
-        )}
+          )}
 
-        {/* Live Classes Management Tab */}
-        {activeTab === 'live' && (
-          <div className="flex flex-col gap-8">
-            <div className="card p-8">
-              <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', fontFamily: 'var(--font-display)', color: 'var(--text-main)' }}>Host a Live Session</h2>
-              <p className="text-gray-400 mb-6">Select a batch and start broadcasting your screen to enrolled students. Students will be notified immediately.</p>
-              
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-semibold text-gray-300">Select Course/Batch</label>
-                  <select className="p-3 bg-[#1a1a1a] border border-white/10 rounded-lg text-white outline-none focus:border-green-500">
-                    <option>3.0 Job-Ready AI Powered Cohort</option>
-                    <option>JEE Physics Pro - Batch A</option>
-                    <option>NEET Biology Intensive</option>
-                  </select>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-semibold text-gray-300">Topic / Agenda</label>
-                  <input type="text" placeholder="e.g., System Design Architecture" className="p-3 bg-[#1a1a1a] border border-white/10 rounded-lg text-white outline-none focus:border-green-500" />
-                </div>
-              </div>
-
-              <Link to="/live-class" className="btn inline-flex items-center gap-2 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all">
-                <PlayCircle size={20} />
-                Go Live Now
-              </Link>
-            </div>
-
-            {/* Scheduled Classes */}
-            <div className="card p-8">
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontFamily: 'var(--font-display)', color: 'var(--text-main)' }}>Upcoming Scheduled Classes</h3>
-              <div className="flex flex-col gap-4">
-                <div className="p-4 border border-white/10 rounded-xl bg-[#111] flex items-center justify-between">
+          {/* ── LIVE TAB ── */}
+          {activeTab === 'live' && (
+            <div className="flex flex-col gap-6">
+              <SectionHeader title="Live Classes" sub="Monitor all active sessions across batches." />
+              <div className="card p-6">
+                <h3 className="font-display font-black text-lg text-[var(--text-main)] mb-2">Host a Live Session</h3>
+                <p className="text-sm text-[var(--text-muted)] mb-5">Select a batch and start broadcasting to enrolled students immediately.</p>
+                <div className="grid sm:grid-cols-2 gap-4 mb-5">
                   <div>
-                    <h4 className="font-bold text-white">Integration by Parts — Advanced Techniques</h4>
-                    <p className="text-sm text-gray-400 mt-1">JEE Mathematics Elite • Tomorrow, 7:30 PM</p>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-2">Select Batch</label>
+                    <select className="w-full bg-[var(--bg-main)] border border-[var(--border-light)] rounded-xl px-4 py-3 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)]">
+                      <option>Batch A — JEE Elite</option>
+                      <option>Batch B — NEET Pro</option>
+                      <option>All Students</option>
+                    </select>
                   </div>
-                  <button className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors">
-                    Edit Schedule
-                  </button>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-2">Session Topic</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., System Design Architecture"
+                      className="w-full bg-[var(--bg-main)] border border-[var(--border-light)] rounded-xl px-4 py-3 text-sm text-[var(--text-main)] focus:outline-none focus:border-[var(--primary)]"
+                    />
+                  </div>
                 </div>
+                <Link
+                  to="/live-class"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest text-xs rounded-xl shadow-lg shadow-red-600/20 transition-all"
+                >
+                  <PlayCircle size={16} /> Go Live Now
+                </Link>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Questies / Doubt Portal Tab */}
-        {activeTab === 'questies' && (
-          <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-end mb-2">
-              <div>
-                <h2 className="text-2xl font-display font-black text-gray-800">Doubt Portal</h2>
-                <p className="text-sm text-gray-500">Review and resolve student academic questions.</p>
+          {/* ── STUDENTS TAB ── */}
+          {activeTab === 'students' && (
+            <div className="flex flex-col gap-6">
+              <SectionHeader title="Student Directory" sub="Manage student records and batch assignments." />
+              <div className="overflow-x-auto">
+                <StudentDirectory />
               </div>
             </div>
-            <QuestieAdminList />
-          </div>
-        )}
+          )}
 
-        {/* Student Management Tab */}
-        {activeTab === 'students' && (
-          <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-end mb-2">
-              <div>
-                <h2 className="text-2xl font-display font-black text-gray-800">Student Directory</h2>
-                <p className="text-sm text-gray-500">Manage student records and assign classroom batches.</p>
+          {/* ── COURSES TAB ── */}
+          {activeTab === 'courses' && (
+            <div className="flex flex-col gap-6">
+              <SectionHeader
+                title="Course Management"
+                sub={user?.role === 'admin' ? 'Create, edit and manage coaching programs.' : 'View current programs and batches.'}
+              />
+              {user?.role === 'admin' ? (
+                <CourseManager />
+              ) : (
+                <div className="card p-12 text-center">
+                  <BookOpen size={36} className="mx-auto text-[var(--text-muted)] opacity-20 mb-4" />
+                  <h3 className="font-display font-black text-lg mb-2 text-[var(--text-main)]">Restricted Access</h3>
+                  <p className="text-sm text-[var(--text-muted)] max-w-sm mx-auto">Only admins can modify the course catalog.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── DOUBTS TAB ── */}
+          {activeTab === 'questies' && (
+            <div className="flex flex-col gap-6">
+              <SectionHeader title="Doubt Portal" sub="Review and resolve student academic questions." />
+              <QuestieAdminList />
+            </div>
+          )}
+
+          {/* ── FINANCE TAB ── */}
+          {activeTab === 'finance' && (
+            <div className="flex flex-col gap-6">
+              <SectionHeader title="Finance & Fee Ledger" sub="Record payments and manage outstanding balances." />
+              <div className="overflow-x-auto">
+                <FinanceManager />
               </div>
             </div>
-            <StudentDirectory />
-          </div>
-        )}
+          )}
 
-        {/* Course Management Tab */}
-        {activeTab === 'courses' && (
-          <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-end mb-2">
-              <div>
-                <h2 className="text-2xl font-display font-black text-gray-800">Course Management</h2>
-                <p className="text-sm text-gray-500">
-                  {user?.role === 'admin' 
-                    ? 'Create, edit, and manage your coaching programs.' 
-                    : 'View current coaching programs and batches.'}
-                </p>
-              </div>
+          {/* ── SYSTEM HEALTH TAB ── */}
+          {activeTab === 'health' && (
+            <div className="flex flex-col gap-6">
+              <SectionHeader title="System Health" sub="Monitor database and service status." />
+              <DatabaseHealth />
             </div>
-            
-            {user?.role === 'admin' ? (
-              <CourseManager />
-            ) : (
-              <div className="p-12 bg-gray-50 border-2 border-dashed border-light rounded-3xl text-center">
-                <BookOpen size={48} className="mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-bold text-gray-800 mb-2">Restricted Access</h3>
-                <p className="text-gray-400 max-w-md mx-auto">
-                  Only administrators have permission to modify the course catalog. Tutors can view course details through the main website.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
-        {/* Finance / Fees Tab */}
-        {activeTab === 'finance' && (
-          <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-end mb-2">
-              <div>
-                <h2 className="text-2xl font-display font-black text-gray-800">Finance & Fee Ledger</h2>
-                <p className="text-sm text-gray-500">Record payments and manage student outstanding balances.</p>
-              </div>
-            </div>
-            <FinanceManager />
-          </div>
-        )}
-
-        {/* System Health Tab */}
-        {activeTab === 'health' && (
-          <div className="flex flex-col gap-6">
-            <DatabaseHealth />
-          </div>
-        )}
-
-        {/* Other tabs placeholders */}
-        {activeTab !== 'overview' && activeTab !== 'live' && activeTab !== 'questies' && activeTab !== 'courses' && activeTab !== 'students' && activeTab !== 'finance' && activeTab !== 'health' && (
-          <div className="card" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
-            <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg-main)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: 'var(--text-light)' }}>
-              {activeTab === 'students' ? <Users size={32} /> : activeTab === 'courses' ? <BookOpen size={32} /> : <IndianRupee size={32} />}
-            </div>
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>
-              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Management
-            </h2>
-            <p style={{ color: 'var(--text-muted)', maxWidth: '500px', margin: '0 auto' }}>
-              Full CRUD interfaces for managing records would go here. Includes data tables with pagination, search, filters, and detailed view/edit modals.
-            </p>
-          </div>
-        )}
-
+        </div>
       </div>
-    </div>
+
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <MobileBottomNav
+        tabs={navItems}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
+
     </div>
   );
 };
 
 export default AdminDashboard;
-

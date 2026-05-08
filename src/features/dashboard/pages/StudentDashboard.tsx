@@ -360,17 +360,74 @@ const StudentDashboard = () => {
             </div>
           )}
 
-          {/* ── PLACEHOLDER TABS ── */}
-          {!['overview', 'my-courses', 'questies'].includes(activeTab) && (
-            <div className="card p-16 text-center">
-              <div className="w-16 h-16 bg-[var(--bg-main)] rounded-3xl flex items-center justify-center mx-auto mb-5 text-[var(--text-muted)] opacity-20">
-                {activeTab === 'study-materials' ? <FileText size={28} /> : <Calendar size={28} />}
+          {/* ── STUDY MATERIALS TAB ── */}
+          {activeTab === 'study-materials' && (
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-xl font-display font-black text-[var(--text-main)]">Study Materials</h2>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    {myMaterials.length} resources across {enrolledCourseData.length} courses
+                  </p>
+                </div>
+                {/* Type filter pills */}
+                <div className="flex gap-2 flex-wrap">
+                  {(['all', 'video', 'pdf', 'quiz'] as const).map(type => (
+                    <button key={type} className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border border-[var(--border-light)] text-[var(--text-muted)] hover:border-orange-500 hover:text-orange-500 transition-all">
+                      {type === 'all' ? 'All' : type === 'video' ? '🎬 Videos' : type === 'pdf' ? '📄 PDFs' : '📝 Quizzes'}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <h2 className="text-xl font-display font-black mb-2 capitalize text-[var(--text-main)]">
-                {activeTab.replace(/-/g, ' ')}
-              </h2>
+
+              {myMaterials.length > 0 ? (
+                <div className="card divide-y divide-[var(--border-light)] overflow-hidden">
+                  {myMaterials.map(mat => (
+                    <div key={mat.id} className="flex items-center justify-between p-4 hover:bg-[var(--bg-main)] transition-colors group">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`p-2.5 rounded-xl shrink-0 ${
+                          mat.type === 'video' ? 'bg-purple-500/10 text-purple-400' :
+                          mat.type === 'pdf'   ? 'bg-red-500/10 text-red-400' :
+                                                 'bg-orange-500/10 text-orange-400'
+                        }`}>
+                          {mat.type === 'video' ? <PlayCircle size={18} /> : mat.type === 'pdf' ? <FileText size={18} /> : <Book size={18} />}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-sm text-[var(--text-main)] truncate group-hover:text-orange-500 transition-colors">{mat.title}</h4>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-0.5">
+                            <span>{mat.chapter}</span>
+                            <span>·</span>
+                            <span>{mat.type === 'video' ? mat.duration : mat.type === 'pdf' ? mat.size : 'Assessment'}</span>
+                            <span>·</span>
+                            <span className={`${mat.type === 'video' ? 'text-purple-400' : mat.type === 'pdf' ? 'text-red-400' : 'text-orange-400'}`}>
+                              {mat.type}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <button className="ml-3 shrink-0 px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-500 text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all">
+                        {mat.type === 'video' ? '▶ Watch' : mat.type === 'pdf' ? '↓ Open' : '→ Start'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="card p-14 text-center">
+                  <FileText size={32} className="mx-auto text-[var(--text-muted)] opacity-20 mb-3" />
+                  <h3 className="font-display font-black text-lg mb-2 text-[var(--text-main)]">No materials yet</h3>
+                  <p className="text-sm text-[var(--text-muted)] italic">Enroll in a course to access study materials.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── SCHEDULE PLACEHOLDER ── */}
+          {activeTab === 'schedule' && (
+            <div className="card p-16 text-center">
+              <Calendar size={32} className="mx-auto text-[var(--text-muted)] opacity-20 mb-4" />
+              <h2 className="text-xl font-display font-black mb-2 text-[var(--text-main)]">Schedule</h2>
               <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed italic mb-6">
-                We're building this section for the best learning experience.
+                Full timetable and class calendar coming soon.
               </p>
               <button
                 onClick={() => setActiveTab('overview')}
@@ -380,6 +437,7 @@ const StudentDashboard = () => {
               </button>
             </div>
           )}
+
 
         </div>
       </div>
