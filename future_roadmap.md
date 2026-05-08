@@ -15,9 +15,9 @@
 2. **Loading States**: Add premium skeleton loaders for all dashboard tabs.
 3. **Global Search**: Command palette (Ctrl+K) to quickly jump to any course, student, or doubt.
 
-
+We will implement this later rememeber"
 My Analysis & Suggestion for the Login Flow:
 Currently, your LoginPage.tsx has a toggle where the user selects their role (Student, Tutor, Admin) before clicking "Sign In". In AuthContext.tsx, you have a "strict role check" that blocks the user if they select the wrong role (e.g., if a student accidentally selects "Tutor", the app shows an "Access Denied" error).
 
 Suggestion: Since their role is securely determined by Supabase (via the profiles table) immediately after they log in with their email and password, you don't actually need to ask them for their role on the login screen. We could completely remove the Student | Tutor | Admin toggle buttons from the UI. They just enter their email and password, and the system automatically logs them in and routes them to their correct dashboard based on their true Supabase role. This makes the login page much cleaner and prevents any accidental "Access Denied" errors from mis-clicks.
-
+"

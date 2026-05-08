@@ -17,6 +17,7 @@ import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { DatabaseHealth } from '../components/DatabaseHealth';
 import MobileBottomNav from '../components/MobileBottomNav';
+import { DashboardTour } from '../components/DashboardTour';
 
 // ─── Stat Card ────────────────────────────────────────────────
 const StatCard = ({
@@ -72,7 +73,7 @@ const AdminDashboard = () => {
     <div className="bg-[var(--bg-main)] min-h-screen flex flex-col">
 
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-6 lg:px-10 flex items-center">
+      <div className="tour-dashboard-header fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-6 lg:px-10 flex items-center">
         <DashboardHeader />
       </div>
 
@@ -139,7 +140,7 @@ const AdminDashboard = () => {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 tour-stats">
                 {adminStats.map((stat, idx) => (
                   <StatCard
                     key={idx}
@@ -154,7 +155,7 @@ const AdminDashboard = () => {
               </div>
 
               {/* Pending Approvals */}
-              <div>
+              <div className="tour-enrollments">
                 <SectionHeader title="Pending Approvals" sub="Review and verify new enrollment requests." />
                 <EnrollmentManager />
               </div>
@@ -163,7 +164,7 @@ const AdminDashboard = () => {
               <div className="grid lg:grid-cols-3 gap-6">
 
                 {/* Student Table */}
-                <div className="lg:col-span-2 card overflow-hidden">
+                <div className="lg:col-span-2 card overflow-hidden tour-recent-students">
                   <div className="flex justify-between items-center p-5 border-b border-[var(--border-light)]">
                     <h3 className="text-base font-display font-black text-[var(--text-main)]">Recent Enrollments</h3>
                     <button onClick={() => setActiveTab('students')} className="text-[var(--primary)] text-xs font-black uppercase tracking-widest hover:underline flex items-center gap-1">
@@ -211,7 +212,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Active Batches */}
-                <div className="card p-5 h-max">
+                <div className="card p-5 h-max tour-batches">
                   <h3 className="text-base font-display font-black text-[var(--text-main)] mb-4">Active Batches</h3>
                   <div className="flex flex-col gap-3">
                     {[
@@ -338,13 +339,13 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* ── MOBILE BOTTOM NAV ── */}
       <MobileBottomNav
         tabs={navItems}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-
+      
+      <DashboardTour role="admin" />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import { DashboardHeader } from '../components/DashboardHeader';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
 import MobileBottomNav from '../components/MobileBottomNav';
+import { DashboardTour } from '../components/DashboardTour';
 
 // ─── Stat Card ───────────────────────────────────────────────
 const StatCard = ({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string | number; sub?: string; color: string }) => (
@@ -130,7 +131,7 @@ const TutorDashboard = () => {
     <div className="bg-[var(--bg-main)] min-h-screen flex flex-col">
 
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-6 lg:px-10 flex items-center">
+      <div className="tour-dashboard-header fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-6 lg:px-10 flex items-center">
         <DashboardHeader />
       </div>
 
@@ -201,13 +202,13 @@ const TutorDashboard = () => {
                   </h1>
                   <p className="text-sm text-[var(--text-muted)] mt-1">Here's what's happening in your classes today.</p>
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="btn btn-primary flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <button onClick={() => setIsModalOpen(true)} className="tour-start-class btn btn-primary flex items-center gap-2 self-start sm:self-auto shrink-0">
                   <PlayCircle size={18} /> Start Live Class
                 </button>
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 tour-stats">
                 <StatCard icon={<Radio size={20} />} label="Active Sessions" value={activeSessions.length} sub="Currently live" color="#ef4444" />
                 <StatCard icon={<BookOpen size={20} />} label="Total Sessions" value={stats.totalSessions} sub="All time" color="#8a76ff" />
                 <StatCard icon={<HelpCircle size={20} />} label="Pending Doubts" value={stats.pendingDoubts} sub="Need your answer" color="#f59e0b" />
@@ -234,7 +235,7 @@ const TutorDashboard = () => {
               )}
 
               {/* Recent Sessions */}
-              <div className="card p-5">
+              <div className="card p-5 tour-recent-sessions">
                 <h2 className="text-sm font-black uppercase tracking-widest text-[var(--text-muted)] mb-4 flex items-center gap-2">
                   <Clock size={14} /> Recent Sessions
                 </h2>
@@ -400,7 +401,8 @@ const TutorDashboard = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
-
+      
+      <DashboardTour role="tutor" />
     </div>
   );
 };

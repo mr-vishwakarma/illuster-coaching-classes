@@ -14,6 +14,7 @@ import { DashboardHeader } from '../components/DashboardHeader';
 import { MyCourses } from '../components/MyCourses';
 import { supabase } from '../../../shared/lib/supabase';
 import MobileBottomNav from '../components/MobileBottomNav';
+import { DashboardTour } from '../components/DashboardTour';
 
 // ─── Live Banner ──────────────────────────────────────────────
 const LiveBanner = ({ session }: { session: any }) => (
@@ -106,7 +107,7 @@ const StudentDashboard = () => {
     <div className="bg-[var(--bg-main)] min-h-screen flex flex-col">
 
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-4 md:px-6 flex items-center">
+      <div className="tour-dashboard-header fixed top-0 left-0 right-0 h-[4.5rem] bg-[var(--bg-card)]/90 backdrop-blur-md border-b border-[var(--border-light)] z-50 px-4 md:px-6 flex items-center">
         <div className="container mx-auto">
           <DashboardHeader />
         </div>
@@ -182,7 +183,7 @@ const StudentDashboard = () => {
               <div className="lg:col-span-2 flex flex-col gap-6 md:gap-8">
 
                 {/* Enrolled Courses */}
-                <section>
+                <section className="tour-my-courses">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg md:text-xl font-display font-black text-[var(--text-main)]">Enrolled Courses</h2>
                     <button onClick={() => setActiveTab('my-courses')} className="text-orange-500 text-xs font-black uppercase tracking-widest hover:underline flex items-center gap-1">
@@ -226,7 +227,7 @@ const StudentDashboard = () => {
                 </section>
 
                 {/* Recent Study Materials */}
-                <section>
+                <section className="tour-study-materials">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg md:text-xl font-display font-black text-[var(--text-main)]">Recent Study Materials</h2>
                     <button onClick={() => setActiveTab('study-materials')} className="text-orange-500 text-xs font-black uppercase tracking-widest hover:underline flex items-center gap-1">
@@ -290,7 +291,7 @@ const StudentDashboard = () => {
                 )}
 
                 {/* Upcoming Classes */}
-                <div className="card p-5">
+                <div className="card p-5 tour-upcoming-classes">
                   <h3 className="flex items-center gap-2 text-base font-display font-black mb-4 text-[var(--text-main)]">
                     <Calendar size={16} className="text-orange-500" /> Upcoming Classes
                   </h3>
@@ -325,7 +326,7 @@ const StudentDashboard = () => {
                 </div>
 
                 {/* Doubt Support CTA */}
-                <div className="card p-5 bg-gradient-to-br from-[#8a76ff]/10 to-transparent border-[#8a76ff]/20">
+                <div className="card p-5 bg-gradient-to-br from-[#8a76ff]/10 to-transparent border-[#8a76ff]/20 tour-doubts-cta">
                   <h3 className="flex items-center gap-2 text-base font-display font-black mb-2 text-[var(--text-main)]">
                     <HelpCircle size={16} className="text-[#8a76ff]" /> Need Help?
                   </h3>
@@ -447,6 +448,8 @@ const StudentDashboard = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
+
+      <DashboardTour role="student" />
     </div>
   );
 };
