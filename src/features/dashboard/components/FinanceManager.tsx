@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 interface EnrollmentFinance {
   id: string;
@@ -19,6 +20,7 @@ interface EnrollmentFinance {
   };
   payments: {
     amount_paid: number;
+    created_at?: string;
   }[];
 }
 
@@ -31,6 +33,7 @@ export const FinanceManager = () => {
   const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentFinance | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [paymentRemarks, setPaymentRemarks] = useState('');
+  const [chartData, setChartData] = useState<{name: string, revenue: number}[]>([]);
   
   // Student Profile Sync State
   const [studentDetails, setStudentDetails] = useState({
@@ -53,7 +56,7 @@ export const FinanceManager = () => {
         id,
         student:profiles(id, full_name, email, phone, address),
         course:courses(title, price),
-        payments:fee_payments(amount_paid)
+        payments:fee_payments(*)
       `)
       .eq('status', 'active');
     
@@ -61,6 +64,7 @@ export const FinanceManager = () => {
       toast.error("Failed to load finance data");
     } else {
       setEnrollments(data as any || []);
+      processChartData(data || []);
     }
     setIsLoading(false);
   };
@@ -98,6 +102,31 @@ export const FinanceManager = () => {
       }
     }
     setIsLoading(false);
+  };
+
+  const processChartData = (data: any[]) => {
+    // Generate last 6 months list
+    const months = Array.from({ length: 6 }).map((_, i) => {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      return d.toLocaleString('default', { month: 'short' });
+    }).reverse();
+
+    const newChartData = months.map(m => ({ name: m, revenue: 0 }));
+
+    data.forEach(enrollment => {
+      enrollment.payments?.forEach((p: any) => {
+        if (!p.created_at && !p.payment_date) return;
+        const pDate = new Date(p.created_at || p.payment_date);
+        const pMonth = pDate.toLocaleString('default', { month: 'short' });
+        const monthEntry = newChartData.find(c => c.name === pMonth);
+        if (monthEntry) {
+          monthEntry.revenue += Number(p.amount_paid) || 0;
+        }
+      });
+    });
+
+    setChartData(newChartData);
   };
 
   const calculateFinance = (enrollment: EnrollmentFinance) => {
@@ -139,6 +168,32 @@ export const FinanceManager = () => {
         </div>
       </div>
 
+      {/* Revenue Analytics Chart */}
+      <div className="card p-6 bg-[var(--bg-card)]">
+        <h3 className="text-base font-display font-black text-[var(--text-main)] mb-6">Revenue Analytics</h3>
+        <div className="h-64 w-full" style={{ minHeight: 250 }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} tickFormatter={(value) => `₹${value}`} dx={-10} />
+              <RechartsTooltip 
+                contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-light)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                itemStyle={{ color: '#f97316', fontWeight: 'bold' }}
+                formatter={(value: any) => [`₹${value}`, 'Revenue']}
+              />
+              <Area type="monotone" dataKey="revenue" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       {/* Search & Actions */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-light">
         <div className="relative w-full md:w-96">
@@ -155,8 +210,9 @@ export const FinanceManager = () => {
 
       {/* Finance Table */}
       <div className="bg-white rounded-2xl border border-light overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left whitespace-nowrap">
+            <thead className="bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
             <tr>
               <th className="px-6 py-4">Student</th>
               <th className="px-6 py-4">Course</th>
@@ -225,7 +281,8 @@ export const FinanceManager = () => {
               <tr><td colSpan={6} className="py-20 text-center text-gray-400">No active enrollments found.</td></tr>
             )}
           </tbody>
-        </table>
+                </table>
+        </div>
       </div>
 
       {/* Payment Modal */}

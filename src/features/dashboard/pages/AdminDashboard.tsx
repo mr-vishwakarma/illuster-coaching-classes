@@ -11,6 +11,7 @@ import { CourseManager } from '../components/CourseManager';
 import { StudentDirectory } from '../components/StudentDirectory';
 import { EnrollmentManager } from '../components/EnrollmentManager';
 import { FinanceManager } from '../components/FinanceManager';
+import { BatchManager } from '../components/BatchManager';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
@@ -59,6 +60,7 @@ const AdminDashboard = () => {
     { id: 'overview',  icon: <BarChart3 size={18} />,    label: 'Overview' },
     { id: 'live',      icon: <Radio size={18} />,         label: 'Live' },
     { id: 'students',  icon: <Users size={18} />,         label: 'Students' },
+    { id: 'batches',   icon: <Database size={18} />,      label: 'Batches' },
     { id: 'courses',   icon: <BookOpen size={18} />,      label: 'Courses' },
     { id: 'questies',  icon: <HelpCircle size={18} />,    label: 'Doubts' },
     { id: 'finance',   icon: <IndianRupee size={18} />,   label: 'Finance' },
@@ -236,9 +238,9 @@ const AdminDashboard = () => {
                   </div>
                   <button
                     className="btn btn-outline w-full mt-4 text-xs"
-                    onClick={() => setActiveTab('courses')}
+                    onClick={() => setActiveTab('batches')}
                   >
-                    Manage Courses
+                    Manage Batches
                   </button>
                 </div>
 
@@ -284,11 +286,16 @@ const AdminDashboard = () => {
           {/* ── STUDENTS TAB ── */}
           {activeTab === 'students' && (
             <div className="flex flex-col gap-6">
-              <SectionHeader title="Student Directory" sub="Manage student records and batch assignments." />
+              <SectionHeader title="Student Directory" sub="Manage student records." />
               <div className="overflow-x-auto">
                 <StudentDirectory />
               </div>
             </div>
+          )}
+
+          {/* ── BATCHES TAB ── */}
+          {activeTab === 'batches' && (
+            <BatchManager />
           )}
 
           {/* ── COURSES TAB ── */}
