@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, User, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../shared/context/AuthContext';
@@ -7,29 +7,20 @@ import { toast } from 'react-toastify';
 
 const Login = () => {
   const [role, setRole] = useState<'student' | 'tutor' | 'admin'>('student');
-  const [email, setEmail] = useState('student@illuster.com');
-  const [password, setPassword] = useState('student123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
-  // Update mock credentials when role changes for easy testing
-  useEffect(() => {
-    if (role === 'admin') {
-      setEmail('admin@illuster.com');
-      setPassword('admin123');
-    } else if (role === 'tutor') {
-      setEmail('tutor@illuster.com');
-      setPassword('tutor123');
-    } else {
-      setEmail('student@illuster.com');
-      setPassword('student123');
-    }
-  }, [role]);
+  // If already logged in, don't show the login page
+  if (user) {
+    return <Navigate to={from} replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +114,6 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-center px-1">
                 <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] ml-2" htmlFor="password">Password</label>
-                <a href="#" className="text-[10px] font-black text-orange-500 hover:underline tracking-widest">Forgot?</a>
               </div>
               <input
                 id="password"
@@ -145,15 +135,6 @@ const Login = () => {
               <ArrowRight size={24} />
             </button>
           </form>
-
-          {/* Sandbox Credentials Hint */}
-          <div className="mt-10 pt-8 border-t border-white/5 text-center">
-            <p className="mb-4 font-black text-orange-500 uppercase tracking-[0.2em] text-[10px]">Sandbox Credentials</p>
-            <div className="flex flex-col gap-1 text-xs font-bold text-white/40">
-              <span>{email}</span>
-              <span>{password}</span>
-            </div>
-          </div>
         </div>
 
         <p className="text-center mt-10 text-[var(--text-muted)] font-medium">
