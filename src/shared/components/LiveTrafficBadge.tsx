@@ -10,7 +10,7 @@ const LiveTrafficBadge = () => {
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.8 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="fixed bottom-24 md:bottom-6 right-6 z-[60]"
+        className="fixed bottom-24 lg:bottom-6 right-6 z-[60]"
       >
         <div className="flex items-center gap-3 bg-black/60 backdrop-blur-xl border border-white/10 px-4 py-2.5 rounded-2xl shadow-2xl shadow-black/50 group hover:border-[#8a76ff]/50 transition-all duration-300">
           {/* Pulsing Dot Indicator */}
