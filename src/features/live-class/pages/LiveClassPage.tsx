@@ -21,6 +21,7 @@ import AgoraRTC, {
   useRemoteUsers,
   useRemoteAudioTracks,
   useRemoteVideoTracks,
+  RemoteUser,
 } from "agora-rtc-react";
 
 const VideoPlayer = ({ track, isScreenShare = false }: { track: any, isScreenShare?: boolean }) => {
@@ -54,6 +55,27 @@ const LiveClassRoom = () => {
   const [participants, setParticipants] = useState<any[]>([]);
   const [roomChannel, setRoomChannel] = useState<RealtimeChannel | null>(null);
   const { sessionId = "default-room" } = useParams();
+
+  // Session metadata from DB
+  const [sessionInfo, setSessionInfo] = useState<{ title: string; batch: string; tutor_name: string } | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from('live_sessions')
+      .select('title, batch, profiles:tutor_id(full_name)')
+      .eq('id', sessionId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setSessionInfo({
+            title: data.title,
+            batch: data.batch,
+            tutor_name: (data.profiles as any)?.full_name || 'Tutor',
+          });
+        }
+      });
+  }, [sessionId]);
+  
   
   // --- Agora Setup ---
   const appId = import.meta.env.VITE_AGORA_APP_ID || "test-app-id";
@@ -149,6 +171,26 @@ const LiveClassRoom = () => {
       if (!isHost && teacherVideoTrack) teacherVideoTrack.stop();
     };
   }, [teacherVideoTrack, isHost]);
+  // -------------------
+
+  // 🔴 End-class auto-redirect for students
+  useEffect(() => {
+    if (!sessionId || isHost) return;
+    const endWatcher = supabase
+      .channel(`end-watch-${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'live_sessions', filter: `id=eq.${sessionId}` },
+        (payload) => {
+          if (payload.new.status === 'ended') {
+            toast.info('The class has ended. Redirecting to dashboard...', { icon: () => <span>📚</span> });
+            setTimeout(() => navigate('/dashboard'), 2500);
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(endWatcher); };
+  }, [sessionId, isHost, navigate]);
   // -------------------
 
   useEffect(() => {
@@ -293,13 +335,13 @@ const LiveClassRoom = () => {
             LIVE
           </div>
           <h1 className="text-xs md:text-lg font-medium text-white/90 border-l border-white/10 pl-2 md:pl-4 truncate">
-            3.0 Job-Ready AI Powered Cohort - System Design Fundamentals
+            {sessionInfo?.title || 'Live Class'}
           </h1>
         </div>
         <div className="flex items-center gap-2 md:gap-3 text-[10px] md:text-sm text-white/50">
-          <span className="bg-white/5 px-2 py-0.5 md:px-3 md:py-1 rounded hidden sm:inline">Batch A</span>
+          <span className="bg-white/5 px-2 py-0.5 md:px-3 md:py-1 rounded hidden sm:inline">{sessionInfo?.batch || 'Live'}</span>
           <span className="hidden sm:inline">•</span>
-          <span className="font-bold">10:02 AM</span>
+          <span className="font-bold">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>
 
@@ -350,7 +392,7 @@ const LiveClassRoom = () => {
 
             <div className="absolute bottom-3 left-3 md:bottom-4 md:left-4 bg-black/60 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-sm flex items-center gap-1.5 md:gap-2">
               <Mic size={12} className="text-green-400 md:w-3.5 md:h-3.5" />
-              <span className="font-bold">Alex Teacher</span>
+              <span className="font-bold">{isHost ? (user?.name || 'You') : (sessionInfo?.tutor_name || 'Teacher')}</span>
             </div>
             
             <button className="absolute top-3 right-3 md:top-4 md:right-4 p-1.5 md:p-2 bg-black/40 hover:bg-black/60 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
@@ -358,23 +400,40 @@ const LiveClassRoom = () => {
             </button>
           </div>
 
-          {/* Students Grid (Bottom strip) */}
-          <div className="h-24 md:h-32 shrink-0 flex gap-2 md:gap-4 overflow-x-auto pb-1 scrollbar-hide">
-            {participants.length > 0 ? (
-              participants.map((p, idx) => (
-                <div key={idx} className="w-32 md:w-48 h-full bg-[#111] rounded-lg md:rounded-xl border border-white/5 shrink-0 relative overflow-hidden">
+          {/* Participants Strip with Camera Thumbnails */}
+          <div className="h-24 md:h-32 shrink-0 flex gap-2 md:gap-3 overflow-x-auto pb-1 scrollbar-hide">
+            {/* Tutor's own self-view tile (host only) */}
+            {isHost && localCameraTrack && !isVideoOff && (
+              <div className="w-32 md:w-48 h-full bg-[#111] rounded-lg md:rounded-xl border border-white/10 shrink-0 relative overflow-hidden">
+                <VideoPlayer track={localCameraTrack} />
+                <div className="absolute bottom-1.5 left-1.5 bg-black/70 text-[8px] md:text-[9px] px-1.5 py-0.5 rounded font-bold">
+                  You
+                </div>
+              </div>
+            )}
+            {/* Remote participant tiles with live video */}
+            {remoteUsers.map((remoteUser) => (
+              <div key={remoteUser.uid} className="w-32 md:w-48 h-full bg-[#111] rounded-lg md:rounded-xl border border-white/10 shrink-0 relative overflow-hidden">
+                {remoteUser.hasVideo ? (
+                  <RemoteUser user={remoteUser} className="w-full h-full" />
+                ) : (
                   <div className="absolute inset-0 bg-gradient-to-t from-[#2a2a2a] to-[#1a1a1a] flex items-center justify-center">
                     <span className="text-xl md:text-3xl opacity-50">👤</span>
                   </div>
-                  <div className="absolute bottom-1.5 left-1.5 right-1.5 flex justify-between items-center">
-                    <div className="bg-black/60 backdrop-blur text-[8px] md:text-[10px] px-1.5 py-0.5 rounded truncate max-w-[80px] md:max-w-[100px] font-bold">
-                      {p.name}
-                    </div>
+                )}
+                <div className="absolute bottom-1.5 left-1.5 right-1.5 flex justify-between items-center">
+                  <div className="bg-black/70 text-[8px] md:text-[9px] px-1.5 py-0.5 rounded truncate max-w-[100px] font-bold">
+                    {participants.find(p => p.id === remoteUser.uid)?.name || `User ${String(remoteUser.uid).slice(0,4)}`}
                   </div>
+                  {!remoteUser.hasAudio && <MicOff size={8} className="text-red-400 shrink-0" />}
                 </div>
-              ))
-            ) : (
-              <div className="flex items-center justify-center w-full text-white/20 text-xs italic">Waiting for participants...</div>
+              </div>
+            ))}
+            {remoteUsers.length === 0 && !isHost && (
+              <div className="flex items-center justify-center w-full text-white/20 text-xs italic">No other participants yet</div>
+            )}
+            {participants.length === 0 && isHost && (
+              <div className="flex items-center justify-center w-full text-white/20 text-xs italic">Waiting for students to join...</div>
             )}
           </div>
 

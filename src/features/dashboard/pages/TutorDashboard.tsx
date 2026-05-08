@@ -10,6 +10,7 @@ import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
+import MobileBottomNav from '../components/MobileBottomNav';
 
 // ─── Stat Card ───────────────────────────────────────────────
 const StatCard = ({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string | number; sub?: string; color: string }) => (
@@ -119,9 +120,9 @@ const TutorDashboard = () => {
 
   const navItems = [
     { id: 'overview',  icon: <BarChart3 size={18} />,   label: 'Overview' },
-    { id: 'live',      icon: <Radio size={18} />,        label: 'Live Classes' },
-    { id: 'questies',  icon: <HelpCircle size={18} />,   label: 'Doubt Portal', badge: stats.pendingDoubts },
-    { id: 'students',  icon: <Users size={18} />,        label: 'My Students' },
+    { id: 'live',      icon: <Radio size={18} />,        label: 'Live' },
+    { id: 'questies',  icon: <HelpCircle size={18} />,   label: 'Doubts', badge: stats.pendingDoubts },
+    { id: 'students',  icon: <Users size={18} />,        label: 'Students' },
     { id: 'schedule',  icon: <Calendar size={18} />,     label: 'Schedule' },
   ];
 
@@ -187,7 +188,7 @@ const TutorDashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 lg:ml-64 p-5 lg:p-8">
+        <div className="flex-1 lg:ml-64 p-5 lg:p-8 pb-24 lg:pb-8">
 
           {/* ── OVERVIEW TAB ── */}
           {activeTab === 'overview' && (
@@ -393,6 +394,12 @@ const TutorDashboard = () => {
           </div>
         </div>
       )}
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <MobileBottomNav
+        tabs={navItems.map(n => ({ id: n.id, icon: n.icon, label: n.label, badge: n.badge }))}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
     </div>
   );

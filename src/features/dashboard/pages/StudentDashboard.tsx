@@ -13,6 +13,7 @@ import { QuestieList } from '../../questies/components/QuestieList';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { MyCourses } from '../components/MyCourses';
 import { supabase } from '../../../shared/lib/supabase';
+import MobileBottomNav from '../components/MobileBottomNav';
 
 // ─── Live Banner ──────────────────────────────────────────────
 const LiveBanner = ({ session }: { session: any }) => (
@@ -91,11 +92,11 @@ const StudentDashboard = () => {
   [user?.enrolledCourses]);
 
   const navTabs = [
-    { id: 'overview',        label: 'Overview',        icon: <BarChart3 size={14} /> },
-    { id: 'my-courses',      label: 'My Courses',      icon: <BookOpen size={14} /> },
-    { id: 'study-materials', label: 'Study Materials', icon: <FileText size={14} /> },
-    { id: 'questies',        label: 'Doubts',          icon: <HelpCircle size={14} /> },
-    { id: 'schedule',        label: 'Schedule',        icon: <Calendar size={14} /> },
+    { id: 'overview',        label: 'Home',      icon: <BarChart3 size={18} /> },
+    { id: 'my-courses',      label: 'Courses',   icon: <BookOpen size={18} /> },
+    { id: 'study-materials', label: 'Materials', icon: <FileText size={18} /> },
+    { id: 'questies',        label: 'Doubts',    icon: <HelpCircle size={18} /> },
+    { id: 'schedule',        label: 'Schedule',  icon: <Calendar size={18} /> },
   ];
 
   const hour = new Date().getHours();
@@ -149,8 +150,8 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Sticky Tab Bar */}
-        <div className="bg-[var(--bg-card)]/80 backdrop-blur-md border-b border-[var(--border-light)] sticky top-[4.5rem] z-30">
+        {/* Sticky Tab Bar - desktop only */}
+        <div className="hidden lg:block bg-[var(--bg-card)]/80 backdrop-blur-md border-b border-[var(--border-light)] sticky top-[4.5rem] z-30">
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex overflow-x-auto scrollbar-hide">
               {navTabs.map(tab => (
@@ -171,7 +172,7 @@ const StudentDashboard = () => {
         </div>
 
         {/* Page Content */}
-        <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
+        <div className="container mx-auto px-4 md:px-6 py-6 md:py-10 pb-24 lg:pb-10">
 
           {/* ── OVERVIEW TAB ── */}
           {activeTab === 'overview' && (
@@ -382,8 +383,15 @@ const StudentDashboard = () => {
 
         </div>
       </div>
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <MobileBottomNav
+        tabs={navTabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
     </div>
   );
 };
+
 
 export default StudentDashboard;
