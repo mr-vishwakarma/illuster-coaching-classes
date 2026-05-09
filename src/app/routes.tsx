@@ -5,15 +5,15 @@ import PageLoader from '../shared/components/PageLoader';
 import NotFoundPage from '../shared/components/NotFoundPage';
 
 // ─── Lazy-loaded pages (enables code-splitting) ──────────────────────────────
-const HomePage = lazy(() => import('../features/home/pages/HomePage'));
-const CoursesPage = lazy(() => import('../features/courses/pages/CoursesPage'));
-const CourseDetailPage = lazy(() => import('../features/courses/pages/CourseDetailPage'));
+const HomePage = lazy(() => import('../features/website/home/pages/HomePage'));
+const CoursesPage = lazy(() => import('../features/website/courses/pages/CoursesPage'));
+const CourseDetailPage = lazy(() => import('../features/website/courses/pages/CourseDetailPage'));
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
 const Dashboard = lazy(() => import('../features/dashboard/pages/Dashboard'));
 const LiveClassPage = lazy(() => import('../features/live-class/pages/LiveClassPage'));
-const AboutPage = lazy(() => import('../features/about/pages/AboutPage'));
-const GalleryPage = lazy(() => import('../features/about/pages/GalleryPage'));
-const RequestCallbackPage = lazy(() => import('../features/about/pages/RequestCallbackPage'));
+const AboutPage = lazy(() => import('../features/website/about/pages/AboutPage'));
+const GalleryPage = lazy(() => import('../features/website/about/pages/GalleryPage'));
+const RequestCallbackPage = lazy(() => import('../features/website/about/pages/RequestCallbackPage'));
 const ReceiptPage = lazy(() => import('../features/dashboard/pages/ReceiptPage'));
 
 // ─── Route definitions ──────────────────────────────────────────────────────

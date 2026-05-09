@@ -2,7 +2,7 @@ import { useRef, useState, forwardRef, useEffect } from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import useSound from 'use-sound';
 import { ChevronLeft, ChevronRight, BookOpen, List, Loader2 } from 'lucide-react';
-import { supabase } from '../../../shared/lib/supabase';
+import { supabase } from '../../../../shared/lib/supabase';
 
 const PAGE_BG    = '#8a76ffff';   
 const ACCENT     = '#3500e4ff';   

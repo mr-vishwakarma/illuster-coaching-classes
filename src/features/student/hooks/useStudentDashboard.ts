@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../../../src/shared/lib/supabase';
-import { courses, studyMaterials } from '../../../features/courses';
+import { courses, studyMaterials } from '../../website/courses';
 import { upcomingClasses } from '../../../features/live-class';
 import { useAuth } from '../../../shared/context/AuthContext';
 
@@ -31,11 +31,11 @@ export const useStudentDashboard = () => {
   }, []);
 
   const enrolledCourseData = useMemo(() =>
-    courses.filter(c => user?.enrolledCourses?.includes(c.id)),
+    courses.filter((c: any) => user?.enrolledCourses?.includes(c.id)),
   [user?.enrolledCourses]);
 
   const myMaterials = useMemo(() =>
-    studyMaterials.filter(m => user?.enrolledCourses?.includes(m.courseId)),
+    studyMaterials.filter((m: any) => user?.enrolledCourses?.includes(m.courseId)),
   [user?.enrolledCourses]);
 
   const recentMaterials = useMemo(() => myMaterials.slice(0, 5), [myMaterials]);

@@ -1,53 +1,22 @@
 import { useStudentDashboard } from '../hooks/useStudentDashboard';
 import { 
-  Book, PlayCircle, FileText, Calendar, Clock, Video,
-  HelpCircle, ChevronRight, TrendingUp, BarChart3,
-  Zap, BookOpen, Radio
+  Book, PlayCircle, FileText, Calendar,
+  HelpCircle, ChevronRight, BarChart3,
+  BookOpen, Radio
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { courses } from '../../courses';
 import { QuestieForm } from '../../questies/components/QuestieForm';
 import { QuestieList } from '../../questies/components/QuestieList';
 import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { MyCourses } from '../components/MyCourses';
-// supabase import removed
+import { LiveBanner } from '../components/LiveBanner';
+import { StudentHero } from '../components/StudentHero';
+import { StudyMaterialsWidget } from '../components/StudyMaterialsWidget';
+import { UpcomingClassesWidget } from '../components/UpcomingClassesWidget';
 import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';
 import { DashboardTour } from '../../../shared/components/layout/DashboardTour';
 
-// ─── Live Banner ──────────────────────────────────────────────
-const LiveBanner = ({ session }: { session: any }) => (
-  <Link
-    to={`/live-class/${session.id}`}
-    className="group flex items-center justify-between px-4 md:px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg hover:from-red-500 hover:to-red-400 transition-all"
-  >
-    <div className="flex items-center gap-3">
-      <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest flex items-center gap-1.5 shrink-0 border border-white/20">
-        <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> Live Now
-      </span>
-      <span className="font-semibold text-sm truncate">
-        <span className="opacity-70">{session.profiles?.full_name || 'Your Tutor'}:</span>{' '}
-        <span className="font-bold">{session.title}</span>
-        <span className="hidden sm:inline opacity-70"> · {session.batch}</span>
-      </span>
-    </div>
-    <span className="shrink-0 flex items-center gap-1.5 text-xs font-black uppercase tracking-widest bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-colors ml-4">
-      <Video size={12} /> Join <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-    </span>
-  </Link>
-);
 
-// ─── Stat Mini Card ───────────────────────────────────────────
-const MiniStat = ({ icon, value, label, color }: { icon: React.ReactNode; value: string | number; label: string; color: string }) => (
-  <div className="card p-4 flex items-center gap-3">
-    <div className="p-2 rounded-lg shrink-0" style={{ background: `${color}18` }}>
-      <div style={{ color }}>{icon}</div>
-    </div>
-    <div>
-      <div className="text-lg font-display font-black text-[var(--text-main)]">{value}</div>
-      <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">{label}</div>
-    </div>
-  </div>
-);
 
 // ─── Main Component ───────────────────────────────────────────
 const StudentDashboard = () => {
@@ -92,36 +61,12 @@ const StudentDashboard = () => {
         ))}
 
         {/* Hero Header */}
-        <div className="bg-[var(--bg-card)] border-b border-[var(--border-light)]">
-          <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              {/* Avatar + Greeting */}
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 text-white flex items-center justify-center font-display text-2xl font-bold shadow-lg shadow-orange-500/20 shrink-0">
-                  {user?.avatar}
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-0.5">{greeting} ☀️</p>
-                  <h1 className="text-xl md:text-3xl font-display font-black text-[var(--text-main)] leading-tight">
-                    {user?.name.split(' ')[0]}!
-                  </h1>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {myClasses.length > 0
-                      ? `${myClasses.length} class${myClasses.length > 1 ? 'es' : ''} coming up this week`
-                      : 'Keep learning — consistency is key.'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Quick Stats Row */}
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                <MiniStat icon={<BookOpen size={16} />} value={enrolledCourseData.length} label="Courses" color="#f97316" />
-                <MiniStat icon={<TrendingUp size={16} />} value="45%" label="Progress" color="#8a76ff" />
-                <MiniStat icon={<Zap size={16} />} value={myClasses.length} label="Upcoming" color="#10b981" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <StudentHero 
+          user={user}
+          greeting={greeting}
+          enrolledCourseCount={enrolledCourseData.length}
+          upcomingClassCount={myClasses.length}
+        />
 
         {/* Sticky Tab Bar - desktop only */}
         <div className="hidden lg:block bg-[var(--bg-card)]/80 backdrop-blur-md border-b border-[var(--border-light)] sticky top-[4.5rem] z-30">
@@ -164,7 +109,7 @@ const StudentDashboard = () => {
                   </div>
                   {enrolledCourseData.length > 0 ? (
                     <div className="grid sm:grid-cols-2 gap-4">
-                      {enrolledCourseData.slice(0, 4).map(course => (
+                      {enrolledCourseData.slice(0, 4).map((course: any) => (
                         <div key={course.id} className="card p-5 flex flex-col group hover:border-orange-500/40 transition-all cursor-pointer">
                           <div className="flex items-center gap-3 mb-5">
                             <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shadow-md shrink-0" style={{ background: `${course.color}15`, color: course.color }}>
@@ -206,36 +151,7 @@ const StudentDashboard = () => {
                       View All <ChevronRight size={12} />
                     </button>
                   </div>
-
-                  {recentMaterials.length > 0 ? (
-                    <div className="card overflow-hidden divide-y divide-[var(--border-light)]">
-                      {recentMaterials.map(mat => (
-                        <div key={mat.id} className="flex items-center justify-between p-4 hover:bg-[var(--bg-main)] transition-colors">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className={`p-2 rounded-lg shrink-0 ${mat.type === 'video' ? 'bg-purple-500/10 text-purple-400' : mat.type === 'pdf' ? 'bg-red-500/10 text-red-400' : 'bg-orange-500/10 text-orange-400'}`}>
-                              {mat.type === 'video' ? <PlayCircle size={18} /> : mat.type === 'pdf' ? <FileText size={18} /> : <Book size={18} />}
-                            </div>
-                            <div className="min-w-0">
-                              <h4 className="font-bold text-sm text-[var(--text-main)] truncate">{mat.title}</h4>
-                              <div className="flex items-center gap-2 text-[10px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-0.5">
-                                <span>{mat.chapter}</span>
-                                <span>·</span>
-                                <span>{mat.type === 'video' ? mat.duration : mat.type === 'pdf' ? mat.size : 'Assessment'}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <button className="ml-3 shrink-0 px-3 py-1.5 rounded-lg border border-[var(--border-light)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--text-main)] hover:text-[var(--bg-card)] hover:border-transparent transition-all">
-                            {mat.type === 'video' ? 'Watch' : mat.type === 'pdf' ? 'Open' : 'Start'}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="card p-10 text-center">
-                      <FileText size={32} className="mx-auto text-[var(--text-muted)] opacity-20 mb-3" />
-                      <p className="text-sm text-[var(--text-muted)] italic">No materials available yet for your courses.</p>
-                    </div>
-                  )}
+                  <StudyMaterialsWidget materials={recentMaterials} />
                 </section>
               </div>
 
@@ -264,37 +180,7 @@ const StudentDashboard = () => {
 
                 {/* Upcoming Classes */}
                 <div className="card p-5 tour-upcoming-classes">
-                  <h3 className="flex items-center gap-2 text-base font-display font-black mb-4 text-[var(--text-main)]">
-                    <Calendar size={16} className="text-orange-500" /> Upcoming Classes
-                  </h3>
-
-                  {myClasses.length > 0 ? (
-                    <div className="flex flex-col gap-3">
-                      {myClasses.slice(0, 3).map(cls => {
-                        const course = courses.find(c => c.id === cls.courseId);
-                        return (
-                          <div key={cls.id} className="p-3 bg-[var(--bg-main)] border border-[var(--border-light)] rounded-xl hover:border-orange-500/30 transition-all">
-                            <div className="flex justify-between items-center mb-1.5">
-                              <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 text-[9px] font-black uppercase tracking-widest">{course?.subject}</span>
-                              <span className="text-[10px] font-bold text-[var(--text-muted)]">{cls.date}</span>
-                            </div>
-                            <h4 className="font-bold text-xs text-[var(--text-main)] mb-2 leading-tight">{cls.title}</h4>
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-[var(--text-muted)]">
-                              <Clock size={10} /> {cls.time}
-                            </div>
-                          </div>
-                        );
-                      })}
-                      <button onClick={() => setActiveTab('schedule')} className="w-full mt-1 py-2.5 rounded-xl border border-[var(--border-light)] text-[10px] font-black uppercase tracking-widest hover:bg-[var(--text-main)] hover:text-[var(--bg-card)] transition-all">
-                        Full Schedule
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Calendar size={28} className="mx-auto text-[var(--text-muted)] opacity-20 mb-2" />
-                      <p className="text-xs text-[var(--text-muted)] italic">No classes scheduled this week.</p>
-                    </div>
-                  )}
+                  <UpcomingClassesWidget classes={myClasses} />
                 </div>
 
                 {/* Doubt Support CTA */}
@@ -355,7 +241,7 @@ const StudentDashboard = () => {
 
               {myMaterials.length > 0 ? (
                 <div className="card divide-y divide-[var(--border-light)] overflow-hidden">
-                  {myMaterials.map(mat => (
+                  {myMaterials.map((mat: any) => (
                     <div key={mat.id} className="flex items-center justify-between p-4 hover:bg-[var(--bg-main)] transition-colors group">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`p-2.5 rounded-xl shrink-0 ${

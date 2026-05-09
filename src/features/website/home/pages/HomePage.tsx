@@ -3,16 +3,16 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Phone, Mail, MapPin, Send } from 'lucide-react';
 import { courses as mockCourses } from '../../courses';
-import { supabase } from '../../../shared/lib/supabase';
+import { supabase } from '../../../../shared/lib/supabase';
+import Skeleton from '../../../../shared/components/Skeleton';
 import { stats } from '../';
-import Skeleton from '../../../shared/components/Skeleton';
 import SienaParallax from '../components/SienaParallax';
 import Typewriter from '../components/Typewriter';
 import PerspectiveCarousel from '../../courses/components/PerspectiveCarousel';
 import StickyCardStack from '../../courses/components/StickyCardStack';
 import TestimonialMarquee from '../../testimonials/components/TestimonialMarquee';
 import AnimatedLogoBackground from '../../about/components/AnimatedLogoBackground';
-import { useTraffic } from '../../../shared/context/TrafficContext';
+import { useTraffic } from '../../../../shared/context/TrafficContext';
 
 const Home = () => {
   const { activeUsers } = useTraffic();
@@ -137,7 +137,7 @@ const Home = () => {
             viewport={{ once: true }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-12"
           >
-            {stats.map((stat, idx) => (
+            {stats.map((stat: any, idx: number) => (
               <motion.div key={idx} variants={itemVariants} className="text-center group">
                 <div className="text-3xl md:text-4xl lg:text-5xl font-display font-black text-primary mb-2 md:mb-3 group-hover:scale-110 transition-transform duration-300">{stat.value}</div>
                 <div className="text-[10px] md:text-sm font-bold text-[var(--text-muted)] uppercase tracking-widest">{stat.label}</div>
