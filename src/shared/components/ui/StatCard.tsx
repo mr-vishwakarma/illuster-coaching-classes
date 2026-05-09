@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 interface StatCardProps {
@@ -7,7 +7,7 @@ interface StatCardProps {
   change?: string;
   positive?: boolean;
   sub?: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   variant?: 'simple' | 'detailed';
 }

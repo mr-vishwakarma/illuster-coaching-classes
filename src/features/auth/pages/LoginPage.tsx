@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, User, ShieldCheck, ArrowLeft } from 'lucide-react';
@@ -131,7 +131,7 @@ const Login = () => {
               className="w-full py-5 bg-white text-black hover:bg-orange-500 hover:text-white rounded-2xl text-xl font-black shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-4 mt-8" 
               disabled={isLoading}
             >
-              {isLoading ? 'Verifying...' : `Access ${role === 'admin' ? 'Tutor' : 'Student'} Panel`} 
+              {isLoading ? 'Verifying...' : `Access ${role.charAt(0).toUpperCase() + role.slice(1)} Panel`} 
               <ArrowRight size={24} />
             </button>
           </form>

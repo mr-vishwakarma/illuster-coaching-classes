@@ -1,4 +1,4 @@
-import React from 'react';
+import { type FC, type FormEvent, type RefObject } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Users, X, Send, MicOff, Mic, VideoOff, Video, Hand } from 'lucide-react';
 
@@ -10,13 +10,13 @@ interface LiveClassSidebarProps {
   messages: any[];
   chatMessage: string;
   setChatMessage: (val: string) => void;
-  handleSendMessage: (e: React.FormEvent) => void;
+  handleSendMessage: (e: FormEvent) => void;
   participants: any[];
   user: any;
-  chatEndRef: React.RefObject<HTMLDivElement | null>;
+  chatEndRef: RefObject<HTMLDivElement | null>;
 }
 
-export const LiveClassSidebar: React.FC<LiveClassSidebarProps> = ({
+export const LiveClassSidebar: FC<LiveClassSidebarProps> = ({
   activeTab, setActiveTab,
   isSidebarOpen, setIsSidebarOpen,
   messages, chatMessage, setChatMessage, handleSendMessage,
