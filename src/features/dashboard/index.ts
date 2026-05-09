@@ -1,2 +1,2 @@
 // ─── Dashboard Feature Public API ────────────────────────────────────────────
-export { adminStats } from './data';
+export { default as Dashboard } from './pages/Dashboard';

@@ -1,7 +1,7 @@
 import { useAuth } from '../../../shared/context/AuthContext';
-import StudentDashboard from './StudentDashboard';
-import AdminDashboard from './AdminDashboard';
-import TutorDashboard from './TutorDashboard';
+import AdminDashboard from '../../admin/pages/AdminDashboard';
+import TutorDashboard from '../../tutor/pages/TutorDashboard';
+import StudentDashboard from '../../student/pages/StudentDashboard';
 
 const Dashboard = () => {
   const { role } = useAuth();

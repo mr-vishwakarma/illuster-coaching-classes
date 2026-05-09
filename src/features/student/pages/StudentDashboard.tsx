@@ -1,20 +1,18 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useStudentDashboard } from '../hooks/useStudentDashboard';
 import { 
   Book, PlayCircle, FileText, Calendar, Clock, Video,
   HelpCircle, ChevronRight, TrendingUp, BarChart3,
   Zap, BookOpen, Radio
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../../shared/context/AuthContext';
-import { courses, studyMaterials } from '../../courses';
-import { upcomingClasses } from '../../live-class';
+import { courses } from '../../courses';
 import { QuestieForm } from '../../questies/components/QuestieForm';
 import { QuestieList } from '../../questies/components/QuestieList';
-import { DashboardHeader } from '../components/DashboardHeader';
+import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { MyCourses } from '../components/MyCourses';
-import { supabase } from '../../../shared/lib/supabase';
-import MobileBottomNav from '../components/MobileBottomNav';
-import { DashboardTour } from '../components/DashboardTour';
+// supabase import removed
+import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';
+import { DashboardTour } from '../../../shared/components/layout/DashboardTour';
 
 // ─── Live Banner ──────────────────────────────────────────────
 const LiveBanner = ({ session }: { session: any }) => (
@@ -53,44 +51,18 @@ const MiniStat = ({ icon, value, label, color }: { icon: React.ReactNode; value:
 
 // ─── Main Component ───────────────────────────────────────────
 const StudentDashboard = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [liveSessions, setLiveSessions] = useState<any[]>([]);
-
-  // Real-time live sessions listener
-  useEffect(() => {
-    const fetchLiveSessions = async () => {
-      const { data } = await supabase
-        .from('live_sessions')
-        .select('id, title, batch, tutor_id, profiles:tutor_id(full_name)')
-        .eq('status', 'live');
-      if (data) setLiveSessions(data);
-    };
-
-    fetchLiveSessions();
-
-    const channel = supabase
-      .channel('student_live_sessions_watch')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_sessions' }, fetchLiveSessions)
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, []);
-
-  const enrolledCourseData = useMemo(() =>
-    courses.filter(c => user?.enrolledCourses?.includes(c.id)),
-  [user?.enrolledCourses]);
-
-  const myMaterials = useMemo(() =>
-    studyMaterials.filter(m => user?.enrolledCourses?.includes(m.courseId)),
-  [user?.enrolledCourses]);
-
-  const recentMaterials = useMemo(() => myMaterials.slice(0, 5), [myMaterials]);
-
-  const myClasses = useMemo(() =>
-    upcomingClasses.filter(c => user?.enrolledCourses?.includes(c.courseId)),
-  [user?.enrolledCourses]);
+  const {
+    user,
+    activeTab,
+    setActiveTab,
+    refreshTrigger,
+    setRefreshTrigger,
+    liveSessions,
+    enrolledCourseData,
+    myMaterials,
+    recentMaterials,
+    myClasses
+  } = useStudentDashboard();
 
   const navTabs = [
     { id: 'overview',        label: 'Home',      icon: <BarChart3 size={18} /> },

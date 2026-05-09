@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
-import { adminStats } from '../';
+import { adminStats } from '../data';
 import { CourseManager } from '../components/CourseManager';
 import { StudentDirectory } from '../components/StudentDirectory';
 import { EnrollmentManager } from '../components/EnrollmentManager';
@@ -15,10 +15,10 @@ import { BatchManager } from '../components/BatchManager';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
-import { DashboardHeader } from '../components/DashboardHeader';
+import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { DatabaseHealth } from '../components/DatabaseHealth';
-import MobileBottomNav from '../components/MobileBottomNav';
-import { DashboardTour } from '../components/DashboardTour';
+import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';
+import { DashboardTour } from '../../../shared/components/layout/DashboardTour';
 
 // ─── Stat Card ────────────────────────────────────────────────
 const StatCard = ({
@@ -143,7 +143,7 @@ const AdminDashboard = () => {
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 tour-stats">
-                {adminStats.map((stat, idx) => (
+                {adminStats.map((stat: any, idx: number) => (
                   <StatCard
                     key={idx}
                     label={stat.label}

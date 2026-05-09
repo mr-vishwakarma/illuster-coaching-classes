@@ -7,11 +7,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
-import { DashboardHeader } from '../components/DashboardHeader';
+import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';
-import MobileBottomNav from '../components/MobileBottomNav';
-import { DashboardTour } from '../components/DashboardTour';
+import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';
+import { DashboardTour } from '../../../shared/components/layout/DashboardTour';
 
 // ─── Stat Card ───────────────────────────────────────────────
 const StatCard = ({ icon, label, value, sub, color }: { icon: React.ReactNode; label: string; value: string | number; sub?: string; color: string }) => (

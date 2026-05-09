@@ -1,39 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { IndianRupee, Plus, Search, TrendingUp, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../../shared/lib/supabase';
-import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
-interface EnrollmentFinance {
-  id: string;
-  student: {
-    full_name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  course: {
-    title: string;
-    price: number;
-  };
-  payments: {
-    amount_paid: number;
-    created_at?: string;
-  }[];
-}
+import type { EnrollmentFinance } from '../api/finance';
+import { useFinance } from '../hooks/useFinance';
 
 export const FinanceManager = () => {
   const navigate = useNavigate();
-  const [enrollments, setEnrollments] = useState<EnrollmentFinance[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { enrollments, isLoading, chartData, recordPayment, calculateFinance } = useFinance();
   const [searchTerm, setSearchTerm] = useState('');
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentFinance | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [paymentRemarks, setPaymentRemarks] = useState('');
-  const [chartData, setChartData] = useState<{name: string, revenue: number}[]>([]);
   
   // Student Profile Sync State
   const [studentDetails, setStudentDetails] = useState({
@@ -44,55 +25,14 @@ export const FinanceManager = () => {
     address: ''
   });
 
-  useEffect(() => {
-    fetchFinanceData();
-  }, []);
-
-  const fetchFinanceData = async () => {
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from('course_enrollments')
-      .select(`
-        id,
-        student:profiles(id, full_name, email, phone, address),
-        course:courses(title, price),
-        payments:fee_payments(*)
-      `)
-      .eq('status', 'active');
-    
-    if (error) {
-      toast.error("Failed to load finance data");
-    } else {
-      setEnrollments(data as any || []);
-      processChartData(data || []);
-    }
-    setIsLoading(false);
-  };
-
   const handleAddPayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEnrollment || paymentAmount <= 0) return;
+    if (!selectedEnrollment) return;
 
-    setIsLoading(true);
+    const success = await recordPayment(selectedEnrollment.id, paymentAmount, paymentRemarks);
     
-    // Insert Payment Record
-    const { error } = await supabase
-      .from('fee_payments')
-      .insert([
-        { 
-          enrollment_id: selectedEnrollment.id, 
-          amount_paid: paymentAmount,
-          remarks: paymentRemarks,
-          recorded_by: (await supabase.auth.getUser()).data.user?.id
-        }
-      ]);
-
-    if (error) {
-      toast.error("Payment recording failed");
-    } else {
-      toast.success("Payment recorded successfully!");
+    if (success) {
       setIsPaymentModalOpen(false);
-      fetchFinanceData();
       setPaymentAmount(0);
       setPaymentRemarks('');
       
@@ -101,39 +41,6 @@ export const FinanceManager = () => {
         navigate(`/receipt/${selectedEnrollment.id}`);
       }
     }
-    setIsLoading(false);
-  };
-
-  const processChartData = (data: any[]) => {
-    // Generate last 6 months list
-    const months = Array.from({ length: 6 }).map((_, i) => {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      return d.toLocaleString('default', { month: 'short' });
-    }).reverse();
-
-    const newChartData = months.map(m => ({ name: m, revenue: 0 }));
-
-    data.forEach(enrollment => {
-      enrollment.payments?.forEach((p: any) => {
-        if (!p.created_at && !p.payment_date) return;
-        const pDate = new Date(p.created_at || p.payment_date);
-        const pMonth = pDate.toLocaleString('default', { month: 'short' });
-        const monthEntry = newChartData.find(c => c.name === pMonth);
-        if (monthEntry) {
-          monthEntry.revenue += Number(p.amount_paid) || 0;
-        }
-      });
-    });
-
-    setChartData(newChartData);
-  };
-
-  const calculateFinance = (enrollment: EnrollmentFinance) => {
-    const paid = enrollment.payments.reduce((sum, p) => sum + Number(p.amount_paid), 0);
-    const total = enrollment.course.price;
-    const due = total - paid;
-    return { paid, total, due };
   };
 
   const filteredEnrollments = enrollments.filter(e => 
