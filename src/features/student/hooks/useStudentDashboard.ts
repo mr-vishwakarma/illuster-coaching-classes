@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../../../src/shared/lib/supabase';
 import { courses, studyMaterials } from '../../website/courses';
-import { upcomingClasses } from '../../../features/live-class';
+import { upcomingClasses } from '../../collaboration/live-class';
 import { useAuth } from '../../../shared/context/AuthContext';
 
 export const useStudentDashboard = () => {

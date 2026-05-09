@@ -9,12 +9,12 @@ const HomePage = lazy(() => import('../features/website/home/pages/HomePage'));
 const CoursesPage = lazy(() => import('../features/website/courses/pages/CoursesPage'));
 const CourseDetailPage = lazy(() => import('../features/website/courses/pages/CourseDetailPage'));
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
-const Dashboard = lazy(() => import('../features/dashboard/pages/Dashboard'));
-const LiveClassPage = lazy(() => import('../features/live-class/pages/LiveClassPage'));
+const Dashboard = lazy(() => import('./pages/DashboardDispatcher'));
+const LiveClassPage = lazy(() => import('../features/collaboration/live-class/pages/LiveClassPage'));
 const AboutPage = lazy(() => import('../features/website/about/pages/AboutPage'));
 const GalleryPage = lazy(() => import('../features/website/about/pages/GalleryPage'));
 const RequestCallbackPage = lazy(() => import('../features/website/about/pages/RequestCallbackPage'));
-const ReceiptPage = lazy(() => import('../features/dashboard/pages/ReceiptPage'));
+const ReceiptPage = lazy(() => import('../features/admin/pages/ReceiptPage'));
 
 // ─── Route definitions ──────────────────────────────────────────────────────
 const AppRoutes = () => {

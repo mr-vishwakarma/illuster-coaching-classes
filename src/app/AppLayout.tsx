@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
-import Navbar from '../shared/components/Navbar';
-import Footer from '../shared/components/Footer';
+import Navbar from '../features/website/shared/components/Navbar';
+import Footer from '../features/website/shared/components/Footer';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
 import LiveTrafficBadge from '../shared/components/LiveTrafficBadge';
 import AppRoutes from './routes';

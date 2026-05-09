@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, CheckCircle2, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
-import { supabase } from '../../../shared/lib/supabase';
-import { useAuth } from '../../../shared/context/AuthContext';
+import { supabase } from '../../../../shared/lib/supabase';
+import { useAuth } from '../../../../shared/context/AuthContext';
 import type { Questie } from '../types';
 
 export const QuestieList = ({ refreshTrigger }: { refreshTrigger: number }) => {

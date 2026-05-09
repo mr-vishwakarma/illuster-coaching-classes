@@ -7,8 +7,8 @@ import {
   X
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../../../shared/lib/supabase';
-import { useAuth } from '../../../shared/context/AuthContext';
+import { supabase } from '../../../../shared/lib/supabase';
+import { useAuth } from '../../../../shared/context/AuthContext';
 import { toast } from 'react-toastify';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import AgoraRTC, { 
@@ -65,7 +65,7 @@ const LiveClassRoom = () => {
       .select('title, batch, profiles:tutor_id(full_name)')
       .eq('id', sessionId)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) {
           setSessionInfo({
             title: data.title,
@@ -207,7 +207,7 @@ const LiveClassRoom = () => {
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'live_sessions', filter: `id=eq.${sessionId}` },
-        (payload) => {
+        (payload: any) => {
           if (payload.new.status === 'ended') {
             toast.info('The class has ended. Redirecting to dashboard...', { icon: () => <span>📚</span> });
             setTimeout(() => navigate('/dashboard'), 2500);
@@ -230,7 +230,7 @@ const LiveClassRoom = () => {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'live_messages', filter: `session_id=eq.${sessionId}` },
-        (payload) => {
+        (payload: any) => {
           setMessages(prev => [...prev, payload.new]);
           scrollToBottom();
         }
@@ -264,7 +264,7 @@ const LiveClassRoom = () => {
           return activeParticipants;
         });
       })
-      .subscribe(async (status) => {
+      .subscribe(async (status: any) => {
         if (status === 'SUBSCRIBED') {
           await presenceChannel.track({
             id: user.id,

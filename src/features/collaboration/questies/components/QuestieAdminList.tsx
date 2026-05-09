@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare, CheckCircle2, Send, User } from 'lucide-react';
-import { supabase } from '../../../shared/lib/supabase';
+import { supabase } from '../../../../shared/lib/supabase';
 import type { Questie } from '../types';
 
 const PAGE_SIZE = 20;

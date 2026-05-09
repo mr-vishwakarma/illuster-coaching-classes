@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
-import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
+import { QuestieAdminList } from '../../collaboration/questies/components/QuestieAdminList';
 import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { supabase } from '../../../shared/lib/supabase';
 import { toast } from 'react-toastify';

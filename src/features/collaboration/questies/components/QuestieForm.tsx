@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Send, Image as ImageIcon, Loader2, CheckCircle2 } from 'lucide-react';
-import { supabase } from '../../../shared/lib/supabase';
-import { useAuth } from '../../../shared/context/AuthContext';
+import { supabase } from '../../../../shared/lib/supabase';
+import { useAuth } from '../../../../shared/context/AuthContext';
 
 const SUBJECTS = ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'General'];
 

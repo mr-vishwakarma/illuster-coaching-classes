@@ -14,7 +14,7 @@ import { FinanceManager } from '../components/FinanceManager';
 import { BatchManager } from '../components/BatchManager';
 import { mockUsers } from '../../auth';
 import { useAuth } from '../../../shared/context/AuthContext';
-import { QuestieAdminList } from '../../questies/components/QuestieAdminList';
+import { QuestieAdminList } from '../../collaboration/questies/components/QuestieAdminList';
 import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { DatabaseHealth } from '../components/DatabaseHealth';
 import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';

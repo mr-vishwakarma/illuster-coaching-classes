@@ -5,8 +5,8 @@ import {
   BookOpen, Radio
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { QuestieForm } from '../../questies/components/QuestieForm';
-import { QuestieList } from '../../questies/components/QuestieList';
+import { QuestieForm } from '../../collaboration/questies/components/QuestieForm';
+import { QuestieList } from '../../collaboration/questies/components/QuestieList';
 import { DashboardHeader } from '../../../shared/components/layout/DashboardHeader';
 import { MyCourses } from '../components/MyCourses';
 import { LiveBanner } from '../components/LiveBanner';
