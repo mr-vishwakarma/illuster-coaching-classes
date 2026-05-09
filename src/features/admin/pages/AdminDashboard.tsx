@@ -20,9 +20,9 @@ import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';
 import { DashboardTour } from '../../../shared/components/layout/DashboardTour';
 
 // Extracted Components
-import { StatCard } from '../components/StatCard';
-import { SectionHeader } from '../components/SectionHeader';
 import { AdminSidebar } from '../components/AdminSidebar';
+import { StatCard } from '../../../shared/components/ui/StatCard';
+import { SectionHeader } from '../../../shared/components/ui/SectionHeader';
 
 // ─── Main Component ───────────────────────────────────────────
 const AdminDashboard = () => {

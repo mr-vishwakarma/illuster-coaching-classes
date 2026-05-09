@@ -1,25 +1,5 @@
-import React from 'react';
-
-interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-  sub?: string;
-  color: string;
-}
-
-const StatCard = ({ icon, label, value, sub, color }: StatCardProps) => (
-  <div className={`card p-5 flex items-start gap-4 border-l-4`} style={{ borderLeftColor: color }}>
-    <div className="p-2.5 rounded-xl" style={{ background: `${color}18` }}>
-      <div style={{ color }}>{icon}</div>
-    </div>
-    <div>
-      <div className="text-2xl font-display font-black text-[var(--text-main)]">{value}</div>
-      <div className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mt-0.5">{label}</div>
-      {sub && <div className="text-[11px] text-[var(--text-muted)] mt-1 opacity-60">{sub}</div>}
-    </div>
-  </div>
-);
+import { Radio, BookOpen, HelpCircle, TrendingUp } from 'lucide-react';
+import { StatCard } from '../../../shared/components/ui/StatCard';
 
 interface TutorStatsProps {
   activeSessionsCount: number;
@@ -27,12 +7,11 @@ interface TutorStatsProps {
   pendingDoubts: number;
 }
 
-import { Radio, BookOpen, HelpCircle, TrendingUp } from 'lucide-react';
-
 export const TutorStats = ({ activeSessionsCount, totalSessions, pendingDoubts }: TutorStatsProps) => {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 tour-stats">
       <StatCard 
+        variant="simple"
         icon={<Radio size={20} />} 
         label="Active Sessions" 
         value={activeSessionsCount} 
@@ -40,6 +19,7 @@ export const TutorStats = ({ activeSessionsCount, totalSessions, pendingDoubts }
         color="#ef4444" 
       />
       <StatCard 
+        variant="simple"
         icon={<BookOpen size={20} />} 
         label="Total Sessions" 
         value={totalSessions} 
@@ -47,6 +27,7 @@ export const TutorStats = ({ activeSessionsCount, totalSessions, pendingDoubts }
         color="#8a76ff" 
       />
       <StatCard 
+        variant="simple"
         icon={<HelpCircle size={20} />} 
         label="Pending Doubts" 
         value={pendingDoubts} 
@@ -54,6 +35,7 @@ export const TutorStats = ({ activeSessionsCount, totalSessions, pendingDoubts }
         color="#f59e0b" 
       />
       <StatCard 
+        variant="simple"
         icon={<TrendingUp size={20} />} 
         label="Students" 
         value="—" 
