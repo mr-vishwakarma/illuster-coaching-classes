@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import ProtectedRoute from '../shared/components/ProtectedRoute';
-import PageLoader from '../shared/components/PageLoader';
-import NotFoundPage from '../shared/components/NotFoundPage';
+import ProtectedRoute from '../shared/components/logic/ProtectedRoute';
+import PageLoader from '../shared/components/ui/PageLoader';
+import NotFoundPage from '../shared/components/ui/NotFoundPage';
 
 // ─── Lazy-loaded pages (enables code-splitting) ──────────────────────────────
 const HomePage = lazy(() => import('../features/website/home/pages/HomePage'));

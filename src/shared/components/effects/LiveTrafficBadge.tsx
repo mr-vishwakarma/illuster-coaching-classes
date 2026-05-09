@@ -1,4 +1,4 @@
-import { useTraffic } from '../context/TrafficContext';
+import { useTraffic } from '../../context/TrafficContext';
 import { Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
-import MouseFollower from '../shared/components/MouseFollower';
+import MouseFollower from '../shared/components/effects/MouseFollower';
 import AppLayout from './AppLayout';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

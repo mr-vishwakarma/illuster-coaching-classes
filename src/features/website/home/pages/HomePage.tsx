@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Phone, Mail, MapPin, Send } from 'lucide-react';
 import { courses as mockCourses } from '../../courses';
 import { supabase } from '../../../../shared/lib/supabase';
-import Skeleton from '../../../../shared/components/Skeleton';
+import Skeleton from '../../../../shared/components/ui/Skeleton';
 import { stats } from '../';
 import SienaParallax from '../components/SienaParallax';
 import Typewriter from '../components/Typewriter';

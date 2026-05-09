@@ -1,8 +1,8 @@
 import { useLocation } from 'react-router-dom';
 import Navbar from '../features/website/shared/components/Navbar';
 import Footer from '../features/website/shared/components/Footer';
-import ErrorBoundary from '../shared/components/ErrorBoundary';
-import LiveTrafficBadge from '../shared/components/LiveTrafficBadge';
+import ErrorBoundary from '../shared/components/ui/ErrorBoundary';
+import LiveTrafficBadge from '../shared/components/effects/LiveTrafficBadge';
 import AppRoutes from './routes';
 
 // ─── Layout wrapper with conditional Navbar/Footer ───────────────────────────
