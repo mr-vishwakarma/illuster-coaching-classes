@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import {
   Users, BookOpen, IndianRupee, AlertCircle, Plus,
-  Edit, ArrowUpRight, ArrowDownRight, PlayCircle,
-  Database, HelpCircle, BarChart3, ChevronRight, Radio, Shield
+  Edit, PlayCircle, Database, HelpCircle, BarChart3, ChevronRight, Radio
 } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
@@ -20,35 +19,10 @@ import { DatabaseHealth } from '../components/DatabaseHealth';
 import MobileBottomNav from '../../../shared/components/layout/MobileBottomNav';
 import { DashboardTour } from '../../../shared/components/layout/DashboardTour';
 
-// ─── Stat Card ────────────────────────────────────────────────
-const StatCard = ({
-  label, value, change, positive, icon, color
-}: {
-  label: string; value: string | number; change: string;
-  positive: boolean; icon: React.ReactNode; color: string;
-}) => (
-  <div className="card p-5 flex flex-col gap-3">
-    <div className="flex items-center justify-between">
-      <span className="text-xs font-black uppercase tracking-widest text-[var(--text-muted)]">{label}</span>
-      <div className="p-2 rounded-lg" style={{ background: `${color}18` }}>
-        <div style={{ color }}>{icon}</div>
-      </div>
-    </div>
-    <div className="text-2xl font-display font-black text-[var(--text-main)]">{value}</div>
-    <div className={`flex items-center gap-1 text-xs font-semibold ${positive ? 'text-green-500' : 'text-red-400'}`}>
-      {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-      {change}
-    </div>
-  </div>
-);
-
-// ─── Section Header ───────────────────────────────────────────
-const SectionHeader = ({ title, sub }: { title: string; sub?: string }) => (
-  <div className="mb-5">
-    <h2 className="text-xl md:text-2xl font-display font-black text-[var(--text-main)]">{title}</h2>
-    {sub && <p className="text-sm text-[var(--text-muted)] mt-0.5">{sub}</p>}
-  </div>
-);
+// Extracted Components
+import { StatCard } from '../components/StatCard';
+import { SectionHeader } from '../components/SectionHeader';
+import { AdminSidebar } from '../components/AdminSidebar';
 
 // ─── Main Component ───────────────────────────────────────────
 const AdminDashboard = () => {
@@ -67,7 +41,6 @@ const AdminDashboard = () => {
     { id: 'health',    icon: <Database size={18} />,      label: 'Health' },
   ];
 
-  // Map adminStats to stat cards (inject icons + colors)
   const statColors = ['#8a76ff', '#10b981', '#f59e0b', '#ef4444'];
   const statIcons = [<Users size={18} />, <BookOpen size={18} />, <IndianRupee size={18} />, <AlertCircle size={18} />];
 
@@ -82,41 +55,12 @@ const AdminDashboard = () => {
       <div className="flex flex-1 pt-[4.5rem]">
 
         {/* Sidebar — Desktop Only */}
-        <div className="hidden lg:flex flex-col w-64 bg-[var(--bg-card)] border-r border-[var(--border-light)] fixed h-[calc(100vh-4.5rem)] z-20 overflow-y-auto pb-6" style={{ top: '4.5rem' }}>
-
-          {/* Admin Profile */}
-          <div className="px-5 py-6 border-b border-[var(--border-light)]">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white flex items-center justify-center font-bold text-lg shadow-lg">
-                {user?.avatar}
-              </div>
-              <div>
-                <div className="font-bold text-sm text-[var(--text-main)] truncate max-w-[130px]">{user?.name}</div>
-                <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest font-bold flex items-center gap-1">
-                  <Shield size={10} className="text-[var(--primary)]" /> Administrator
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Nav Items */}
-          <nav className="flex flex-col gap-1 px-3 pt-4">
-            {navItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  activeTab === item.id
-                    ? 'bg-[var(--primary-light)] text-[var(--primary)]'
-                    : 'text-[var(--text-muted)] hover:bg-[var(--bg-main)] hover:text-[var(--text-main)]'
-                }`}
-              >
-                <span className="flex items-center gap-3">{item.icon}{item.label}</span>
-                {activeTab === item.id && <ChevronRight size={14} />}
-              </button>
-            ))}
-          </nav>
-        </div>
+        <AdminSidebar 
+          user={user} 
+          navItems={navItems} 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+        />
 
         {/* Main Content */}
         <div className="flex-1 lg:ml-64 p-5 lg:p-8 pb-24 lg:pb-8">
