@@ -78,6 +78,15 @@
     animation: skeleton-loading 1.5s infinite linear;
   }
 
+  html {
+    font-size: 14px;
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
   body {
     @apply bg-[var(--bg-main)] text-[var(--text-main)] font-sans antialiased transition-colors duration-300;
     margin: 0;

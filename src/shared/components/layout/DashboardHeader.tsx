@@ -1,18 +1,30 @@
 import { Link } from 'react-router-dom';
-import { Sun, Moon, ArrowLeft, LogOut, User } from 'lucide-react';
+import { Sun, Moon, ArrowLeft, LogOut, User, Menu } from 'lucide-react';
 import { useTheme } from '../../../shared/context/ThemeContext';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { motion } from 'framer-motion';
 
-export const DashboardHeader = () => {
+interface DashboardHeaderProps {
+  onMenuClick?: () => void;
+}
+
+export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
 
   return (
     <div className="flex justify-between items-center w-full">
 
-      {/* Left — Logo + Back */}
+      {/* Left — Hamburger (Mobile) + Logo + Back */}
       <div className="flex items-center gap-4">
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="lg:hidden p-2 rounded-xl bg-[var(--bg-main)] hover:bg-[var(--border-light)] text-[var(--text-main)] transition-all shadow-sm border border-[var(--border-light)]"
+          >
+            <Menu size={20} />
+          </button>
+        )}
         <Link to="/" className="hover:opacity-80 transition-all hover:scale-105 active:scale-95 shrink-0">
           <img src="/logo.png" alt="Illuster" className="h-8 md:h-10 w-auto" />
         </Link>
